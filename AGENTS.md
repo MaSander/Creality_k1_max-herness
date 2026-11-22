@@ -21,6 +21,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/skills/k1max-impressora/SKILL.md` | Conexão com a K1 Max sem root (IP 192.168.0.69): status e histórico (`k1max_status.py`) e **envio para a lista sem imprimir** (`enviar_k1max.py`) |
 | `.claude/skills/k1max-calibracao/SKILL.md` | Calibração (flow, PA, fluxo volumétrico, retração) e troca de bico 0,4/0,2 |
 | `.claude/perfis/K1_Max_bico_0.2_Alexandre.creality_printer` | Pacote de perfis do bico 0,2 (impressora, processos e filamentos) para importar no Creality |
+| `.claude/perfis/perfis_creality_7.3.zip` e `creality-print-7.3/` | **Todos** os perfis de usuário do Creality Print 7.3 dele (bicos 0,4 e 0,2), exportados para o irmão importar. Instruções em `COMO-IMPORTAR.md`; atualize com `exportar_perfis.ps1` |
 | `.claude/referencias/` | Projetos `.3mf` aprovados, usados como base (snowboarder 1:25, bico 0,4 detalhe e bico 0,2 v5) |
 | `projetos-base/` | Projetos `.3mf` de referência (por bico e filamento) usados como `MODELO`/`CONFIG` na geração |
 | `pecas/` | Uma pasta por peça com `README.md` de registro (config aprovada, resultado, lições); peças nossas via Git LFS, modelos de terceiros em `local/` (ignorada) |

@@ -1,0 +1,19 @@
+{
+    "base_id": "GP004",
+    "enable_support": "1",
+    "from": "User",
+    "inherits": "0.08mm Standard @Creality K1 Max 0.4 nozzle",
+    "inner_wall_line_width": "0.38",
+    "inner_wall_speed": "50",
+    "layer_height": "0.1",
+    "name": "PEÇA DELICADA M5",
+    "outer_wall_line_width": "0.38",
+    "outer_wall_speed": "40",
+    "print_settings_id": "PEÇA DELICADA M5",
+    "small_perimeter_speed": "20",
+    "sparse_infill_density": "100%",
+    "support_style": "snug",
+    "top_shell_layers": "5",
+    "version": "26.9.30.12",
+    "wall_loops": "6"
+}

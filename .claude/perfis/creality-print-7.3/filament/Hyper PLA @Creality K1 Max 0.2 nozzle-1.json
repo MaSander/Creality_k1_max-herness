@@ -1,0 +1,39 @@
+{
+    "base_id": "GFSA04",
+    "chamber_temperature": [
+        "35"
+    ],
+    "customized_plate_temp": [
+        "50"
+    ],
+    "customized_plate_temp_initial_layer": [
+        "50"
+    ],
+    "filament_flow_ratio": [
+        "0.98"
+    ],
+    "filament_max_volumetric_speed": [
+        "3"
+    ],
+    "filament_retract_before_wipe": [
+        "nil"
+    ],
+    "filament_settings_id": [
+        "Hyper PLA @Creality K1 Max 0.2 nozzle-1"
+    ],
+    "filament_z_hop_types": [
+        "Slope Lift"
+    ],
+    "from": "User",
+    "inherits": "Hyper PLA @Creality K1 Max 0.4 nozzle",
+    "is_custom_defined": "0",
+    "material_flow_temp_graph": "[[0.3,190],  [0.4,190],  [0.5,220]]",
+    "name": "Hyper PLA @Creality K1 Max 0.2 nozzle-1",
+    "pressure_advance": [
+        "0.24"
+    ],
+    "slow_down_layer_time": [
+        "12"
+    ],
+    "version": "25.9.29.17"
+}
