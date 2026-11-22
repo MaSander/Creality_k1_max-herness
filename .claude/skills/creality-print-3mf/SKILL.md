@@ -13,7 +13,7 @@ description: Como ler, revisar, gerar e alterar projetos .3mf do Creality Print 
 | `Metadata/project_settings.config` | JSON com **todas** as configurações (impressora + filamento + processo) |
 | `Metadata/model_settings.config` | nome do objeto, `assemble_item transform` e configurações por objeto, se houver |
 | `Metadata/layer_heights_profile.txt` | altura de camada variável, quando existe (incompatível com suporte Organic) |
-| `Metadata/plate_*.png/json` | miniaturas e placa; o Creality regenera ao fatiar |
+| `Metadata/plate_*.png/json` | miniaturas e placa; o Creality aberto regenera, mas o fatiamento por linha de comando **copia** `plate_1.png` para o G-code (o `gerar_projeto_creality.py` redesenha as imagens da malha nova) |
 
 **Posição na mesa:** a malha fica centrada em XY na origem, com o meio da altura em z = 0. O `transform` do item é `1 0 0 0 1 0 0 0 1 150 150 <meia altura>`, igual no `3dmodel.model` e no `assemble_item`.
 
@@ -149,7 +149,7 @@ Os nomes podem variar um pouco entre versões. Confirme com captura de tela se h
 ```
 .venv/bin/python .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf [--saida ~/Downloads] [--nome peca]
 ```
-- Saída: `<nome>_bico<d>_<filamento>_<tempo>.gcode`, com miniaturas 96 e 300 px embutidas. O CLI não renderiza miniatura, e o script usa a imagem da placa que o fatiador gera. O resumo mostra bico, filamento, temperaturas, camada, suporte, brim, tempo e gramas.
+- Saída: `<nome>_bico<d>_<filamento>_<tempo>.gcode`, com miniaturas 96 e 300 px embutidas. O CLI não renderiza miniatura: ele usa o `Metadata/plate_1.png` que já está no `.3mf`. Projetos do `gerar_projeto_creality.py` já trazem a imagem da peça nova; num `.3mf` editado de outro jeito, confira se a miniatura é da peça certa. O resumo mostra bico, filamento, temperaturas, camada, suporte, brim, tempo e gramas.
 - **Versão:** o Mac tem o Creality Print **7.2.2**, e os projetos do Alexandre são salvos no **7.3**. O CLI recusa arquivo mais novo. O script para e avisa, e só fatia com `--permitir-versao-nova` (opções novas podem ser ignoradas). O melhor é deixar os dois computadores na mesma versão.
 - **Windows: não funciona** (testado em 22/11/2026 no PC do Alexandre, Creality Print 7.3). O `CrealityPrint.exe` não tem modo linha de comando: `--help` trava, `--export-3mf` dá "GUI parameter parsing failed" e `--slice` abre a janela sem fatiar. O script para e avisa. No PC dele, o fatiamento é no programa: abra o .3mf, **Slice plate** e **Export G-code**. Sem o G-code, o tempo que você informar é estimativa; diga isso.
 - Para mandar à impressora (sem imprimir): `enviar_k1max.py` da skill `k1max-impressora`.
