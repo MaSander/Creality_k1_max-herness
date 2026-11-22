@@ -30,6 +30,9 @@ def grupo(k):
 
 
 def main():
+    # o console do Windows usa cp1252 e quebrava no "✓"
+    for f in (sys.stdout, sys.stderr):
+        f.reconfigure(encoding="utf-8", errors="replace")
     src, dst, mudancas = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
     sem_var = "--sem-altura-variavel" in sys.argv
     zin = zipfile.ZipFile(src)
@@ -59,14 +62,23 @@ def main():
         data = zin.read(item.filename)
         if item.filename == "Metadata/project_settings.config":
             data = json.dumps(s, indent=4, ensure_ascii=False).encode()
-        zout.writestr(item, data)
+        # ZipInfo novo: reaproveitar o `item` do zip de entrada muda o offset dele
+        # e a releitura de `zin` depois dava "Bad magic number for file header".
+        info = zipfile.ZipInfo(item.filename, item.date_time)
+        info.compress_type = zipfile.ZIP_DEFLATED
+        info.external_attr = item.external_attr
+        zout.writestr(info, data)
     zout.close()
+    zin.close()
 
-    # conferencia
-    zc = zipfile.ZipFile(dst)
-    assert zc.testzip() is None
-    assert all(zin.read(n) == zc.read(n) for n in zin.namelist() if n.startswith("3D/"))
-    c = json.loads(zc.read("Metadata/project_settings.config"))
+    # conferencia, com os dois zips reabertos do zero
+    with zipfile.ZipFile(src) as za, zipfile.ZipFile(dst) as zc:
+        assert zc.testzip() is None
+        for n in za.namelist():
+            if n == "Metadata/project_settings.config" or (sem_var and n == "Metadata/layer_heights_profile.txt"):
+                continue
+            assert za.read(n) == zc.read(n), f"arquivo mudou sem querer: {n}"
+        c = json.loads(zc.read("Metadata/project_settings.config"))
     for k in ["printer_settings_id", "nozzle_diameter", "filament_settings_id", "nozzle_temperature",
               "hot_plate_temp", "filament_flow_ratio", "pressure_advance", "layer_height", "enable_support",
               "support_style", "brim_type", "brim_object_gap", "elefant_foot_compensation"]:

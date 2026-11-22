@@ -109,7 +109,10 @@ def tempo_curto(t):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    # o console do Windows usa cp1252: sem isto os acentos saem quebrados
+    for f in (sys.stdout, sys.stderr):
+        f.reconfigure(encoding="utf-8", errors="replace")
+    ap =argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("projeto")
     ap.add_argument("--saida", default=os.path.expanduser("~/Downloads"))
     ap.add_argument("--nome")
@@ -119,6 +122,13 @@ def main():
     a = ap.parse_args()
 
     projeto = os.path.abspath(a.projeto)
+    if platform.system() == "Windows" and not a.exe:
+        # Testado em 22/11/2026 no PC do Alexandre (Creality Print 7.3): o CrealityPrint.exe do
+        # Windows não tem modo linha de comando. "--help" trava, "--export-3mf" dá
+        # "GUI parameter parsing failed" e "--slice" abre a janela do programa sem fatiar.
+        sys.exit("No Windows o Creality Print 7.3 não fatia pela linha de comando (abre a janela).\n"
+                 "Fatie no programa: abra o .3mf, Slice plate e Export G-code.\n"
+                 "Para tentar outro executável mesmo assim, passe --exe.")
     exe = achar_exe(a.exe)
     v_cli, v_arq = versao_cli(exe), versao_3mf(projeto)
     versao_nova = tupla(v_arq)[:3] > tupla(v_cli)[:3]

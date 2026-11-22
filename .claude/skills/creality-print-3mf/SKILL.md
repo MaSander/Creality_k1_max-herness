@@ -62,7 +62,7 @@ python3 gerar_projeto_creality.py MODELO.3mf CONFIG.3mf peca.stl SAIDA.3mf "Nome
 ```
 
 ## Cuidado técnico com o zipfile do Python
-`zout.writestr(item, data)` reaproveitando o `ZipInfo` do arquivo de entrada **altera o offset dele**. Ler o ZIP de entrada depois disso dá "Bad magic number for file header". O arquivo de saída fica correto: para conferir, reabra os dois ZIPs do zero.
+`zout.writestr(item, data)` reaproveitando o `ZipInfo` do arquivo de entrada **altera o offset dele**. Ler o ZIP de entrada depois disso dá "Bad magic number for file header". O arquivo de saída fica correto. Para não ter o erro, crie um `ZipInfo` novo para cada arquivo e confira reabrindo os dois ZIPs do zero; o `alterar_config_3mf.py` já faz assim desde 22/11/2026.
 
 ## Revisar um projeto salvo por ele
 - Compare `project_settings.config` com a versão anterior e liste as chaves que mudaram.
@@ -151,7 +151,7 @@ Os nomes podem variar um pouco entre versões. Confirme com captura de tela se h
 ```
 - Saída: `<nome>_bico<d>_<filamento>_<tempo>.gcode`, com miniaturas 96 e 300 px embutidas. O CLI não renderiza miniatura, e o script usa a imagem da placa que o fatiador gera. O resumo mostra bico, filamento, temperaturas, camada, suporte, brim, tempo e gramas.
 - **Versão:** o Mac tem o Creality Print **7.2.2**, e os projetos do Alexandre são salvos no **7.3**. O CLI recusa arquivo mais novo. O script para e avisa, e só fatia com `--permitir-versao-nova` (opções novas podem ser ignoradas). O melhor é deixar os dois computadores na mesma versão.
-- Windows: procura `C:\Program Files\Creality\Creality Print*\CrealityPrint.exe` (ainda **não testado** no PC do Alexandre). Se não achar, use `--exe`.
+- **Windows: não funciona** (testado em 22/11/2026 no PC do Alexandre, Creality Print 7.3). O `CrealityPrint.exe` não tem modo linha de comando: `--help` trava, `--export-3mf` dá "GUI parameter parsing failed" e `--slice` abre a janela sem fatiar. O script para e avisa. No PC dele, o fatiamento é no programa: abra o .3mf, **Slice plate** e **Export G-code**. Sem o G-code, o tempo que você informar é estimativa; diga isso.
 - Para mandar à impressora (sem imprimir): `enviar_k1max.py` da skill `k1max-impressora`.
 
 ## Pacotes de perfil (.creality_printer)
