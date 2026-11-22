@@ -42,6 +42,28 @@ O nome do G-code costuma trazer o filamento (`..._PLA_...`), mas isso é só uma
 ```
 - Apagar **só com pedido explícito** e só pelo nome exato. O script recusa o arquivo em uso na impressão e confere depois se ele sumiu da lista.
 
+- Às vezes o 1º envio logo depois de ligar a impressora responde OK mas o arquivo não aparece na lista (21/11/2026). O script avisa; é só enviar de novo.
+
+## Detecção por IA da câmera – testado em 21/11/2026
+A K1 Max detecta falha (peça solta, "espaguete") pela câmera, mas **só com a IA ligada**: em 21/11/2026 estava tudo em 0, e uma peça descolou duas vezes sem nenhum aviso. Os campos aparecem no `k1max_status.py bruto`:
+
+| Campo | O que é |
+|---|---|
+| `aiSw` | IA ligada |
+| `aiDetection` | detecção de falha durante a impressão |
+| `aiPausePrint` | pausa sozinha quando detecta |
+| `aiFirstFloor` | confere a 1ª camada (só no início da impressão) |
+
+Para ligar, use o mesmo comando do Creality Print (WebSocket 9999, `{"method":"set","params":{"<campo>":1}}`), **com a impressora parada**, e depois confira no `bruto` se o campo ficou em 1:
+```
+cd .claude/skills/k1max-impressora && ../../../.venv/bin/python -c "
+from k1max_status import IP_PADRAO, _ws_get
+for k in ('aiSw','aiDetection','aiPausePrint','aiFirstFloor'): _ws_get(IP_PADRAO, {'method':'set','params':{k:1}}, duracao=2)"
+../../../.venv/bin/python k1max_status.py bruto | grep '"ai'
+```
+- Mexa nisso só com pedido. Também dá para ligar pela tela, em Configurações, na opção de detecção por IA.
+- A IA não pega tudo: nas peças grandes, vale olhar as primeiras camadas mesmo assim.
+
 ## Meta do projeto (decidida pelo Marcelo em 20/11/2026)
 1. Ler status e histórico. 2. Enviar o arquivo **sem imprimir**. 3. Fatiar pela linha de comando.
 **Não** fazer início remoto da impressão: quem está começando precisa ir até a máquina e conferir bico, filamento, mesa vazia e tampa. Não instalar root nem Moonraker para isso.
