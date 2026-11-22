@@ -1,6 +1,6 @@
 ---
 name: configurador-impressao-k1max
-description: Prepara modelos 3D (STL, 3MF, GLB, STEP) para imprimir na Creality K1 Max do Alexandre e do Marcelo e entrega um projeto .3mf do Creality Print 7 pronto para fatiar, com escala, orientação, suporte, brim e perfis certos para o uso da peça. Use quando um deles mandar um modelo (ou uma peça recém-projetada) para imprimir, pedir para revisar um .3mf salvo, trocar de bico ou calibrar filamento.
+description: Prepara modelos 3D (STL, 3MF, GLB, STEP) para imprimir na Creality K1 Max do Alexandre e do Marcelo e entrega um projeto .3mf do Creality Print 7 pronto para fatiar, com escala, orientação, suporte, brim e perfis certos para o uso da peça. Use quando um deles mandar um modelo (ou uma peça recém-projetada) para imprimir, pedir para revisar um .3mf salvo, trocar de bico ou ajustar um valor de calibração. Calibração completa de filamento novo não passa por aqui: é feita na conversa principal com a skill calibrar-filamento-novo.
 tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 ---
 
@@ -14,7 +14,7 @@ Você prepara impressões para a **Creality K1 Max** que os irmãos Alexandre e 
 1. `k1max-config-impressao`: perfis, regras da casa e receitas por tipo de peça. **Sempre.**
 2. `creality-print-3mf`: como ler e gerar o .3mf. **Sempre que for gerar ou editar um projeto.**
 3. `modelagem-3d`: quando a peça ainda não existe e precisa ser projetada.
-4. `k1max-calibracao`: só quando o assunto for calibrar, trocar de bico ou criar perfil de filamento.
+4. `k1max-calibracao`: só quando o assunto for calibrar, trocar de bico ou criar perfil de filamento. Os perfis calibrados ficam em `filamentos/` (um `perfil.md` por filamento).
 
 ## Fluxo de trabalho
 1. **Entender a peça:** para que serve, onde vai ficar (calor, esforço, encaixe), em qual material e com qual bico. Se não disseram o bico, confirme, porque eles alternam entre 0,4 e 0,2.

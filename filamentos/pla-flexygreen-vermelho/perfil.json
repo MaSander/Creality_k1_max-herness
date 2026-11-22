@@ -1,0 +1,47 @@
+{
+  "slug": "pla-flexygreen-vermelho",
+  "filamento": {
+    "tipo": "PLA",
+    "marca": "FLEXYGREEN",
+    "linha": "",
+    "cor": "Vermelho",
+    "lote": "SKU 2605, lote 1182, 27/10/2025",
+    "diametro_medido": 1.75,
+    "temp_fabricante": "190-230",
+    "mesa_fabricante": "50-60",
+    "nome_preset": "PLA FLEXYGREEN Vermelho"
+  },
+  "base_generica": "Generic PLA @Creality K1 Max 0.4 nozzle",
+  "criado_em": "2026-11-22",
+  "notas": [
+    "Calibração rápida: temperatura e flow testados; PA e fluxo máximo herdados do PLA FLEXYGREEN da casa (0,4), provisórios."
+  ],
+  "bicos": {
+    "0.4": {
+      "preset": "PLA FLEXYGREEN Vermelho @Creality K1 Max 0.4 nozzle",
+      "status": "em_andamento",
+      "parametros": {
+        "filament_diameter": 1.75,
+        "nozzle_temperature": 215,
+        "nozzle_temperature_initial_layer": 220,
+        "hot_plate_temp": 55,
+        "hot_plate_temp_initial_layer": 55,
+        "slow_down_layer_time": 0
+      },
+      "testes": [
+        {
+          "data": "2026-11-22",
+          "teste": "temperatura",
+          "faixa": "230 → 190 °C, passo 5 (torre oficial do Creality Print, mesa 55)",
+          "resultado": "Pouquíssimos fiapos em todos os blocos; ponte e balanço bons em quase todos; melhor acabamento em 215; a única quebra à mão foi na emenda 215/210; no fim do bloco de 195 as camadas pararam de grudar e a torre soltou da mesa",
+          "parametros": {
+            "nozzle_temperature": 215,
+            "nozzle_temperature_initial_layer": 220
+          },
+          "obs": "210 é o primeiro ponto fraco (o topo do suporte de carretel a 210 também falhou). Se peça funcional soltar camada, subir para 220."
+        }
+      ]
+    }
+  },
+  "atualizado_em": "2026-11-22"
+}

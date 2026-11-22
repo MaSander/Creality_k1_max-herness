@@ -5,6 +5,8 @@ description: Roteiro e contas das calibrações do Creality Print 7 na K1 Max do
 
 # Calibração – K1 Max
 
+> **Filamento novo:** o passo a passo guiado (perguntas, um teste por vez, registro em `filamentos/` e preset exportado) está na skill `calibrar-filamento-novo`. Esta skill guarda as contas e os procedimentos que ela usa.
+
 ## Antes de calibrar
 - **Presets:** a impressora do bico em uso e o filamento **da versão daquele bico**. Por exemplo, para o bico 0,2: `PLA FLEXYGREEN @Creality K1 Max 0.2 nozzle`.
   - Nunca calibre em cima do perfil de outro bico, porque sobrescreve a calibração dele.
