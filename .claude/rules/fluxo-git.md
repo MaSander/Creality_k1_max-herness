@@ -2,6 +2,9 @@
 
 Alexandre e Marcelo mexem no mesmo repositório. Para um não atropelar o outro, **toda mudança entra por branch e PR**.
 
+- **Repositório:** `github.com/MaSander/Creality_k1_max-herness`, transferido do Alexandre para o Marcelo em 22/11/2026. O endereço antigo redireciona, mas cada clone deve apontar para o novo: `git remote set-url origin https://github.com/MaSander/Creality_k1_max-herness`.
+- **Proteção no GitHub** (ruleset "main protegida"): a `main` não aceita push direto, force push nem exclusão. O PR é obrigatório, com 0 aprovações para o autor poder mesclar. A branch é apagada sozinha no GitHub depois do merge.
+
 ## Regras
 1. **Nada de commit nem push direto na `main`.** Ela só recebe PR mesclado.
 2. **Uma branch por assunto**, sempre a partir da `main` atualizada:
