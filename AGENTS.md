@@ -29,6 +29,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `filamentos/` | Uma pasta por filamento calibrado: `perfil.md`, `perfil.json` e o preset `.json` para importar |
 | `pecas/` | Uma pasta por peça com `README.md` de registro (config aprovada, resultado, lições); peças nossas via Git LFS, modelos de terceiros em `local/` (ignorada) |
 | `requirements.txt` | Bibliotecas Python dos scripts e da análise de malha |
+| `.claude/rules/fluxo-git.md` | Fluxo de trabalho com Git: branch por assunto e PR, nada direto na `main` |
 
 ## Quando usar o quê
 - **Projetar uma peça nova** (a partir de medidas, desenho ou foto) → skill `modelagem-3d` para modelar; depois o agente `configurador-impressao-k1max` prepara a impressão.
@@ -45,6 +46,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 - PLA: lembrar da **tampa aberta**. Trocou o bico: **autoteste e nivelamento**.
 - Todo projeto entregue vai acompanhado do **checklist** do agente, verificado por código.
 - Repositório **público**: não subir modelo de terceiros sem licença que permita redistribuir (veja `pecas/README.md`).
+- **Git:** nada de commit direto na `main`. Antes de editar um arquivo do repositório, crie uma branch do assunto (`peca/`, `skill/`, `fix/`, `perfil/`, `docs/`) a partir da `main` atualizada, e entregue por PR. Detalhes em `.claude/rules/fluxo-git.md`.
 
 ## Ambientes por pessoa
 Antes de salvar ou rodar algo, identifique **em qual computador** a sessão está (`uname`, caminho do repositório). Não use o caminho de um no computador do outro.
