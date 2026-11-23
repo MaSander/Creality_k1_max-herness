@@ -79,8 +79,8 @@ Se um item do menu não existir ou tiver outro nome na versão do Creality Print
 ## Passo 4: fechar
 1. `concluir` (o script recusa se faltar temperatura, flow, PA ou fluxo máximo) e `exportar`.
 2. Mostre o resumo (`mostrar`) e peça para conferir no Creality Print se o preset tem os mesmos valores.
-3. O JSON exportado em `filamentos/<slug>/` serve de backup e para o outro irmão importar (*File → Import → Import Configs*). Na primeira vez, confirme com quem importou que o preset apareceu para o bico certo; se não aparecer, anote aqui o que precisou mudar.
-4. Atualize as tabelas de perfis em `k1max-config-impressao` e "Resultados atuais" em `k1max-calibracao` (regra de manutenção do `AGENTS.md`).
+3. O JSON exportado em `filamentos/<slug>/` serve de backup e para o outro irmão importar (*File → Import → Import Configuration*). Na primeira vez, confirme com quem importou que o preset apareceu para o bico certo; se não aparecer, anote aqui o que precisou mudar.
+4. Com o preset salvo no Creality Print, sincronize: `uv run .claude/perfis/sincronizar_perfis.py exportar` e depois `tabela --gravar`. A tabela de perfis de `k1max-config-impressao` é gerada dos presets; não edite à mão (passo a passo em `.claude/perfis/COMO-IMPORTAR.md`).
 5. Pergunte antes de fazer commit: o repositório é compartilhado e público.
 
 ## Regras
