@@ -15,7 +15,7 @@ Antes de subir um modelo baixado, **confira a licença** (no MakerWorld, ela fic
 
 ## Backup das versões intermediárias (por enquanto)
 - **Marcelo:** Google Drive pessoal, pasta `3D/K1-Max/pecas/<nome-da-peca>/`, com o mesmo nome de arquivo de `local/`.
-- **Alexandre:** a definir.
+- **Alexandre:** a mesma pasta do Marcelo (`3D/K1-Max/pecas/<nome-da-peca>/`), compartilhada com ele como editor e com atalho no Meu Drive dele (no PC dele, `G:\Meu Drive\3D\K1-Max\pecas\`).
 - Ao trocar de versão, mova a anterior para `local/` (e para o backup) e deixe no git só a atual.
 
 ## Git LFS
