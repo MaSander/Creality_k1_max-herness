@@ -182,6 +182,23 @@ uv run .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf [--saida PAST
 - **Windows: não funciona** (testado em 22/11/2026 no PC do Alexandre, Creality Print 7.3). O `CrealityPrint.exe` não tem modo linha de comando: `--help` trava, `--export-3mf` dá "GUI parameter parsing failed" e `--slice` abre a janela sem fatiar. O script para e avisa. No PC dele, o fatiamento é no programa: abra o .3mf, **Slice plate** e **Export G-code**. Sem o G-code, o tempo que você informar é estimativa; diga isso.
 - Para mandar à impressora (sem imprimir): `enviar_k1max.py` da skill `k1max-impressora`.
 
+### Fatiar com o OrcaSlicer (`--fatiador orca`) – experimental, testado em 22/11/2026
+O Creality Print é derivado do OrcaSlicer, e o OrcaSlicer tem linha de comando nos dois sistemas. Serve de saída para o Windows, onde o Creality Print não fatia por script. **O padrão continua sendo o Creality Print**; só use o OrcaSlicer quando pedirem ou quando não houver outro jeito, e diga que é experimental.
+```
+uv run .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf --fatiador orca
+```
+- Instalar: macOS, `brew install --cask orcaslicer`; Windows, o instalador de https://github.com/OrcaSlicer/OrcaSlicer/releases. Se o script não achar o programa, passe `--exe` ou defina `K1_ORCA_EXE`.
+- O arquivo sai com `_orca` no nome, e o resumo avisa que é experimental.
+- **O que foi comparado no Mac** (OrcaSlicer 2.5.2 contra Creality Print 7.2.2, mesmos `.3mf` salvos no 7.3):
+  - o OrcaSlicer abre o projeto do Creality Print direto, sem conversão;
+  - G-code de início, temperaturas, pressure advance e número de camadas: **iguais**;
+  - peça sem suporte (corpo de prova M3): filamento 5,05 g contra 5,06 g; tempo estimado 19 min contra 17 min;
+  - **peça com suporte Organic (snowboarder): a peça sai quase igual (paredes a menos de 1% de diferença, preenchimento a menos de 3%), mas o suporte sai com 62% mais material** (20,2 g contra 17,6 g no total; 4 h 41 contra 4 h 03). O suporte que "solta fácil" foi acertado no Creality Print: no OrcaSlicer ele é outro;
+  - cerca de 100 opções que só existem no Creality Print são ignoradas (ventoinhas especiais, temperatura por fluxo, `creality_flush_time` e outras);
+  - o OrcaSlicer acrescenta `MINIMUM_CRUISE_RATIO` ao comando `SET_VELOCITY_LIMIT`. Não foi testado se o firmware de fábrica da K1 Max aceita.
+- **Falta para confiar:** imprimir uma peça sem suporte e uma com suporte fatiadas pelo OrcaSlicer e comparar com as do Creality Print. **Nenhum G-code do OrcaSlicer foi impresso até agora.** No Windows o `--fatiador orca` não foi testado.
+- Não mude os perfis para o OrcaSlicer: os presets continuam sendo os do Creality Print (`.claude/perfis/`).
+
 ## Pacotes de perfil (.creality_printer)
 - Também é um ZIP:
   - `bundle_structure.json` com `printer_config`, `filament_config`, `process_config` e `printer_preset_name`;
