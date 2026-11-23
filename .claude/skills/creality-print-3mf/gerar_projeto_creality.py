@@ -17,6 +17,10 @@ O script usa um projeto MODELO salvo pelo proprio usuario (com 1 objeto na mesa)
 troca a malha, posiciona no centro da mesa, pega as configuracoes de um projeto do
 usuario (para herdar os perfis e calibracoes dele) e altera so as chaves pedidas.
 
+Do MODELO fica so a estrutura: bloqueadores, modificadores e outras partes extras do
+objeto sao retirados, e a altura de camada variavel (layer_heights_profile.txt) tambem,
+porque pertenciam a peca antiga. O script recusa malha que nao cabe na mesa.
+
 Uso
 ---
   uv run .claude/skills/creality-print-3mf/gerar_projeto_creality.py MODELO.3mf CONFIG.3mf peca.stl SAIDA.3mf NOME --config mudancas.json
@@ -107,6 +111,11 @@ def main():
     # 1) malha: centraliza na origem em XY e com o meio da altura em z=0 (padrao do Creality)
     mesh = trimesh.load(mesh_path, force="mesh")
     bed_center = (k1comum.MESA[0] / 2, k1comum.MESA[1] / 2)
+    if not len(mesh.faces):
+        raise SystemExit(f"a malha esta vazia: {mesh_path}")
+    if any(mesh.extents[i] > k1comum.MESA[i] for i in range(3)):
+        raise SystemExit("a malha nao cabe na mesa de 300 x 300 x 300 mm: "
+                         + " x ".join(f"{e:.1f}" for e in mesh.extents) + " mm")
     half_h = mesh.extents[2] / 2
     c = mesh.bounds.mean(axis=0)
     mesh.apply_translation([-c[0], -c[1], -mesh.bounds[0][2] - half_h])
@@ -114,9 +123,19 @@ def main():
     with zipfile.ZipFile(tmpl) as zin:
         arquivos = {n: zin.read(n) for n in zin.namelist()}
     obj = arquivos["3D/Objects/object_1.model"].decode()
+    # partes extras do MODELO (bloqueadores, modificadores): saem, porque eram da peca antiga
+    blocos = list(re.finditer(r'<object id="(\d+)"[^>]*>.*?</object>', obj, re.S))
+    if not blocos:
+        raise SystemExit("o MODELO nao tem nenhum <object> em 3D/Objects/object_1.model")
+    extras = [b.group(1) for b in blocos[1:]]
+    for b in reversed(blocos[1:]):
+        obj = obj[:b.start()] + obj[b.end():]
+    if extras:
+        print(f"partes extras do MODELO retiradas: {len(extras)}")
     head = obj[:obj.index("<vertices>")]
     tail = obj[obj.index("</triangles>") + len("</triangles>"):]
-    verts = "".join(f'<vertex x="{x:.6f}" y="{y:.6f}" z="{z:.6f}"/>' for x, y, z in mesh.vertices)
+    # precisao de float32 (.9g): com casas fixas, vertices quase coincidentes se fundem e a malha abre
+    verts = "".join(f'<vertex x="{x:.9g}" y="{y:.9g}" z="{z:.9g}"/>' for x, y, z in mesh.vertices)
     tris = "".join(f'<triangle v1="{a}" v2="{b}" v3="{c_}"/>' for a, b, c_ in mesh.faces)
     new_obj = head + "<vertices>" + verts + "</vertices><triangles>" + tris + "</triangles>" + tail
 
@@ -134,8 +153,12 @@ def main():
     t, n = re.subn(r'(<item objectid="\d+"[^>]*?transform=")[^"]+(")', r"\g<1>" + transform + r"\2", t)
     if n != 1:
         raise SystemExit("o MODELO precisa ter exatamente 1 objeto na mesa")
+    for oid in extras:
+        t = re.sub(rf'<component\b[^>]*\bobjectid="{oid}"[^>]*/>', "", t)
     trocar["3D/3dmodel.model"] = t.encode()
     t = arquivos["Metadata/model_settings.config"].decode()
+    for oid in extras:
+        t = re.sub(rf'\s*<part id="{oid}"[^>]*>.*?</part>', "", t, flags=re.S)
     t = re.sub(r'(assemble_item[^>]*?transform=")[^"]+(")', r"\g<1>" + transform + r"\2", t)
     t = re.sub(r'(<metadata key="name" value=")[^"]*(")', r"\g<1>" + name + r"\2", t)
     trocar["Metadata/model_settings.config"] = t.encode()
@@ -144,7 +167,10 @@ def main():
         if f in arquivos:
             redesenhadas[f] = png_size(arquivos[f])
             trocar[f] = render_png(mesh, redesenhadas[f], vista)
-    k1comum.copiar_zip(tmpl, dst, trocar)
+    remover = [f for f in ("Metadata/layer_heights_profile.txt",) if f in arquivos]
+    if remover:
+        print("altura de camada variavel do MODELO retirada")
+    k1comum.copiar_zip(tmpl, dst, trocar, remover)
 
     # 4) conferencia
     with zipfile.ZipFile(dst) as z:

@@ -121,7 +121,7 @@ Notas:
 - Tolerância de furo: ele já usou um perfil "0.20mm PLA FLEXY 0.07 tolerancia furo".
 
 ## Orientação
-- Teste orientações com trimesh comparando área de contato e área em balanço acima de 45°.
+- Teste orientações com `analisar_malha.py` (skill `creality-print-3mf`), comparando a área de contato e a área em balanço de cada uma.
 - Peças altas e finas: brim de 3 a 5 mm e aceleração mais baixa.
 - Verifique se não há partes "flutuando" (ilhas sem apoio). Já aconteceu de uma aleta da tampa da ventoinha ficar solta no ar.
 

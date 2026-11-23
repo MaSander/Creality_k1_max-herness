@@ -47,13 +47,12 @@ description: Como ler, revisar, gerar e alterar projetos .3mf do Creality Print 
 2. **Configurações:** um projeto de `projetos-base/` com a impressora, o bico e o filamento certos, para herdar a calibração.
    - Se não existir projeto para aquele bico ou filamento, **peça que salvem um** (instruções em `projetos-base/README.md`). Não invente perfil.
 3. **Gerar:** rode `gerar_projeto_creality.py` (nesta pasta) com o JSON só das chaves de processo.
-4. Se mudar chaves de filamento ou impressora, ajuste à mão e coloque as chaves no índice [1] ou [2] de `different_settings_to_system`.
-   - **Modelo com bloqueadores ou várias partes** (como o snowboarder): o script troca só a 1ª malha e as outras partes iriam junto. Antes, faça uma cópia limpa: deixe só o 1º `<object>` em `object_1.model`, só o `<component objectid="1">` em `3dmodel.model` e só a `normal_part` em `model_settings.config`.
-5. **Altura de camada variável:** se usar suporte Organic, remova `Metadata/layer_heights_profile.txt` ao copiar o ZIP.
-6. **Conferência por código:**
-   - `testzip()`;
-   - releia a malha de `object_1.model`: dimensões e se está fechada;
-   - imprima as chaves do checklist (impressora, bico, filamento, temperaturas, flow, PA, brim gap, compensação de pé de elefante, suporte).
+4. O script cuida sozinho de três coisas:
+   - cada chave alterada vai para o grupo certo de `different_settings_to_system` (processo, filamento ou impressora);
+   - **MODELO com bloqueadores ou várias partes** (como o snowboarder): as partes extras são retiradas, porque eram da peça antiga;
+   - a altura de camada variável do MODELO (`Metadata/layer_heights_profile.txt`) é retirada.
+5. O script recusa malha maior que a mesa e grava os vértices com precisão de float32.
+6. **Conferência por código:** rode o `checklist_3mf.py` (seção "Analisar e conferir por código").
 
 Grave as chaves num arquivo `.json` (funciona igual no PowerShell e no bash) e rode da raiz do repositório:
 ```
@@ -62,6 +61,30 @@ uv run .claude/skills/creality-print-3mf/gerar_projeto_creality.py MODELO.3mf CO
 `mudancas.json`: `{"layer_height":"0.12","wall_loops":"3","brim_object_gap":"0","elefant_foot_compensation":"0"}`
 
 O script recusa SAIDA igual ao MODELO ou ao CONFIG e registra cada chave no grupo certo (processo, filamento ou impressora).
+
+## Analisar e conferir por código
+Dois scripts desta pasta, iguais no Windows e no macOS. Os dois saem com código 1 quando reprovam.
+
+**`analisar_malha.py`** – antes de gerar o projeto, para qualquer malha (STL, OBJ, GLB) ou `.3mf`:
+```
+uv run .claude/skills/creality-print-3mf/analisar_malha.py peca.stl [--angulo 45] [--brim 5] [--render previa.png] [--json]
+```
+- Mostra dimensões, se está fechada, corpos (e quantos não encostam na mesa), volume, se cabe em 300 × 300 × 300 com o brim, área de contato e as regiões em balanço (mm², posição e altura).
+- Reprova malha aberta, que não cabe ou sem nenhuma face apoiada na mesa.
+- Analisa na orientação do arquivo. `--render` grava 4 vistas com o balanço em vermelho e o contato em azul.
+- Não mede espessura de parede nem folga de print-in-place.
+
+**`checklist_3mf.py`** – antes de entregar o projeto:
+```
+uv run .claude/skills/creality-print-3mf/checklist_3mf.py PROJETO.3mf --origem CONFIG.3mf --bico 0.4 [--permitir chave,chave] [--render previa.png]
+```
+- `--origem`: o projeto de onde vieram as configurações. Qualquer chave de **filamento** diferente é `[FALHA]`, a não ser as de `--permitir` (alteradas com autorização).
+- `--bico`: o bico montado na impressora, confirmado com quem pediu.
+- Confere impressora e bico, brim encostado (gap 0 **e** pé de elefante 0), malha fechada dentro do `.3mf`, se cabe e está centrada e apoiada na mesa, suporte (folga Z ≥ 0,24 em PLA, Organic sem altura variável, interface, distância lateral) e lista os balanços.
+- Compara o filamento com o preset de `.claude/perfis/` e dá `[aviso]` se diferir (o preset pode ter sido atualizado depois do projeto).
+- O que o código não tem como saber sai como `[manual]`: escala contra a medida de referência, motivo da orientação e render de perto quando a malha foi alterada.
+
+A leitura do `.3mf` e a análise ficam em `ferramentas/k1malha.py` (`ler_3mf`, `analisar`, `render`): use essas funções em vez de reescrever a conferência.
 
 ## Cuidado técnico com o zipfile do Python
 `zout.writestr(item, data)` reaproveitando o `ZipInfo` do arquivo de entrada **altera o offset dele**. Ler o ZIP de entrada depois disso dá "Bad magic number for file header". O arquivo de saída fica correto. Para não ter o erro, crie um `ZipInfo` novo para cada arquivo e confira reabrindo os dois ZIPs do zero. É o que faz o `copiar_zip` de `ferramentas/k1comum.py`, usado pelos três scripts desta pasta: ao escrever um script novo que grave `.3mf`, use essa função.
@@ -178,6 +201,6 @@ Nos dois: Python com `uv run`, da raiz do repositório (veja "Ambientes por pess
 - A pasta `AppData\Roaming\Creality` (perfis) não está liberada. Entregue perfis como pacote para importar.
 
 ### Nos dois computadores: gravar a malha no .3mf
-- Escreva as coordenadas com precisão de float32 (`{:.9g}`). Com 5 a 7 casas fixas, vértices quase coincidentes se fundem e a malha abre (esquiador, 20/11/2026).
-- Para conferir, releia com `process=False`: o fatiador usa os triângulos por índice.
+- Escreva as coordenadas com precisão de float32 (`{:.9g}`). Com 5 a 7 casas fixas, vértices quase coincidentes se fundem e a malha abre (esquiador, 20/11/2026). O `gerar_projeto_creality.py` grava assim.
+- Para conferir, releia com `process=False`: o fatiador usa os triângulos por índice. É o que o `k1malha.ler_3mf` faz.
 - Para reduzir a malha, use `manifold3d` (`simplify`, `set_tolerance(1e-4)`). O `fast_simplification` abriu buracos.

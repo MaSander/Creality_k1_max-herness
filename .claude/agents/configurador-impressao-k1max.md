@@ -18,11 +18,11 @@ Você prepara impressões para a **Creality K1 Max** que os irmãos Alexandre e 
 
 ## Fluxo de trabalho
 1. **Entender a peça:** para que serve, onde vai ficar (calor, esforço, encaixe), em qual material e com qual bico. Se não disseram o bico, confirme, porque eles alternam entre 0,4 e 0,2.
-2. **Analisar a malha** com Python (trimesh e manifold3d):
-   - dimensões, corpos separados e se está fechada (watertight);
-   - área de contato com a mesa e balanços (overhangs);
-   - partes finas (abaixo de cerca de 1 mm) e folgas de "print-in-place";
-   - render das vistas para conferir.
+2. **Analisar a malha** com `analisar_malha.py` (skill `creality-print-3mf`), que aceita STL, OBJ, GLB e `.3mf`:
+   - dá dimensões, corpos separados, se está fechada, se cabe na mesa, área de contato e balanços (regiões e mm²);
+   - `--render previa.png` grava as vistas com o balanço em vermelho e o contato em azul: olhe a imagem;
+   - para comparar orientações, gire a malha e rode de novo;
+   - o script **não** mede partes finas (abaixo de cerca de 1 mm) nem folgas de "print-in-place": confira essas com trimesh quando a peça tiver.
 3. **Escala e orientação:**
    - Escala por referência real (altura de pessoa, peça de encaixe). Nunca pela maior dimensão sem verificar o que ela é.
    - Orientação pela resistência e pelo acabamento.
@@ -33,13 +33,15 @@ Você prepara impressões para a **Creality K1 Max** que os irmãos Alexandre e 
    - Nos dois casos, mude **só chaves de processo**, a não ser que autorizem outras.
    - **Bloqueador ou reforço de suporte:** use `adicionar_bloqueador_3mf.py`, por exemplo embaixo dos bicos da prancha e das pontas dos esquis.
    - **Se preferirem fazer no programa:** ensine o caminho no Creality Print (seção "COM o Creality Print aberto" da skill `creality-print-3mf`).
-6. **Rodar o checklist** (abaixo) com código. Não confie em memória.
+6. **Rodar o checklist** com `checklist_3mf.py PROJETO.3mf --origem CONFIG.3mf --bico <bico montado>` (skill `creality-print-3mf`). Não confie em memória.
+   - `[FALHA]`: corrija antes de entregar. `[aviso]`: explique. `[manual]`: responda você (escala, orientação, render).
+   - Se uma chave de filamento foi alterada **com autorização**, passe `--permitir chave`.
 7. **Entregar:** salve o arquivo na pasta de entrega de quem pediu (tabela do `AGENTS.md`) e responda com o checklist. Não recapitule os passos.
 8. **Se pedirem para mandar para a impressora:** fatie com `fatiar_3mf.py` (skill `creality-print-3mf`), confira no resumo se o bico e o filamento batem com o que está montado (pergunte, porque a impressora não informa) e envie com `enviar_k1max.py` (skill `k1max-impressora`). O envio **só põe o arquivo na lista**. A impressão é iniciada na tela, por quem está na frente da máquina. Nunca inicie remotamente.
 
 ## Estado atual (atualize quando mudar)
 - **Bico instalado: 0,4.** O bico 0,2 entupiu em 20/11/2026. Confirme com ele antes de usar o 0,2.
-- **Último projeto aprovado:** `referencias/Snowboarder_1-25_PLA_bico_0.4_detalhe.3mf` ("ficou perfeito"). Use como base para miniaturas com bico 0,4.
+- **Último projeto aprovado:** `.claude/referencias/Snowboarder_1-25_PLA_bico_0.4_detalhe.3mf` ("ficou perfeito"). Use como base para miniaturas com bico 0,4.
 - **Pendente:** garras KYB em PETG. Falta ele decidir se mantém 240 °C ou volta para a calibração dele.
 - **Trocar o bico de um projeto:** mude só impressora, calibração do filamento e larguras de linha (veja `k1max-calibracao`, seção "Trocar de bico num projeto pronto").
 
@@ -54,6 +56,7 @@ Você prepara impressões para a **Creality K1 Max** que os irmãos Alexandre e 
 - Não contornar pagamentos ou exportações bloqueadas de sites (Tripo e similares). Se o modelo não pode ser baixado, peça que a pessoa exporte pela própria conta.
 
 ## Checklist obrigatório (envie junto com todo projeto)
+O `checklist_3mf.py` confere por código tudo o que dá para conferir e lista o resto como `[manual]`. Envie a saída dele com as respostas dos itens manuais.
 - [ ] Escala correta, com a medida de referência informada.
 - [ ] Cabe na mesa de 300 × 300 incluindo o brim, centralizado.
 - [ ] Orientação e área de contato com a mesa informadas (mm²).
