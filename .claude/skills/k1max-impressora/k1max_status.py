@@ -1,12 +1,14 @@
 """Lê status e histórico da Creality K1 Max (firmware de fábrica) pelo WebSocket da porta 9999.
 
-Só leitura: não envia comandos de impressão, temperatura ou movimento.
+Não envia comandos de impressão, temperatura ou movimento. O único comando que altera algo
+é "ia --ligar" (liga a detecção de falha pela câmera), e só com a impressora parada.
 Só biblioteca padrão do Python.
 
-Uso:
-  python k1max_status.py status [--ip 192.168.0.69]
-  python k1max_status.py historico [--ip 192.168.0.69] [--n 10]
-  python k1max_status.py bruto [--ip ...]          # JSON completo do status
+Uso (da raiz do repositório):
+  uv run .claude/skills/k1max-impressora/k1max_status.py status [--ip 192.168.0.69]
+  uv run .claude/skills/k1max-impressora/k1max_status.py historico [--n 10]
+  uv run .claude/skills/k1max-impressora/k1max_status.py bruto      # JSON completo do status
+  uv run .claude/skills/k1max-impressora/k1max_status.py ia [--ligar]
 """
 import argparse
 import base64
@@ -14,7 +16,12 @@ import datetime
 import json
 import os
 import socket
+import sys
 import time
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ferramentas"))
+import k1comum
 
 IP_PADRAO = "192.168.0.69"
 
@@ -111,16 +118,39 @@ def historico(ip, n):
     return lista
 
 
+CAMPOS_IA = {"aiSw": "IA ligada", "aiDetection": "detecção de falha durante a impressão",
+             "aiPausePrint": "pausa sozinha quando detecta", "aiFirstFloor": "confere a 1ª camada"}
+
+
+def ia(ip, ligar):
+    pedido = {"method": "get", "params": {"ReqPrintObjects": 1}}
+    d = _ws_get(ip, pedido)
+    if ligar:
+        if d.get("state") in (1, 5):
+            sys.exit("A impressora está imprimindo ou pausada: ligue a IA com ela parada.")
+        for campo in CAMPOS_IA:
+            _ws_get(ip, {"method": "set", "params": {campo: 1}}, duracao=2)
+        d = _ws_get(ip, pedido)
+    for campo, texto in CAMPOS_IA.items():
+        print(f"{campo} = {d.get(campo)}  ({texto})")
+    if ligar and any(d.get(c) != 1 for c in CAMPOS_IA):
+        sys.exit("Algum campo não ficou em 1: confira na tela da impressora.")
+
+
 if __name__ == "__main__":
+    k1comum.saida_utf8()
     ap = argparse.ArgumentParser()
-    ap.add_argument("acao", choices=["status", "historico", "bruto"])
+    ap.add_argument("acao", choices=["status", "historico", "bruto", "ia"])
     ap.add_argument("--ip", default=IP_PADRAO)
     ap.add_argument("--n", type=int, default=10)
+    ap.add_argument("--ligar", action="store_true", help="com 'ia': liga a detecção pela câmera")
     a = ap.parse_args()
     if a.acao == "status":
         status(a.ip)
     elif a.acao == "historico":
         historico(a.ip, a.n)
+    elif a.acao == "ia":
+        ia(a.ip, a.ligar)
     else:
         print(json.dumps(_ws_get(a.ip, {"method": "get", "params": {"ReqPrintObjects": 1}}),
                          ensure_ascii=False, indent=1))

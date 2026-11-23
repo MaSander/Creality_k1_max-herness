@@ -12,8 +12,7 @@ Contas, procedimentos e referências do bico 0,2 ficam em `k1max-calibracao`. Le
 ## Registro (sempre pelo script)
 Todo resultado vai para `filamentos/<slug>/` pelo `perfil_filamento.py`. Ele grava `perfil.json` (estado), gera `perfil.md` (leitura) e exporta o preset. Registrar **logo depois de cada teste** permite retomar a calibração outro dia sem perder nada.
 
-- Mac do Marcelo: `.venv/bin/python .claude/skills/calibrar-filamento-novo/perfil_filamento.py <comando>`
-- PC do Alexandre: Python completo com `-P` (veja `AGENTS.md`).
+Da raiz do repositório, igual no Windows e no macOS: `uv run .claude/skills/calibrar-filamento-novo/perfil_filamento.py <comando>`
 
 | Comando | Para quê |
 |---|---|

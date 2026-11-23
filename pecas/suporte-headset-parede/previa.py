@@ -1,6 +1,6 @@
 """Prévia (PNG com 4 vistas, renderizada por raio) e análise de balanço de um STL do suporte.
 
-Uso: .venv/bin/python pecas/suporte-headset-parede/previa.py <arquivo.stl> <saida.png> [resolucao]
+Uso: uv run pecas/suporte-headset-parede/previa.py <arquivo.stl> <saida.png> [resolucao]
 """
 import sys
 import numpy as np

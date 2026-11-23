@@ -4,80 +4,53 @@ Altera configuracoes de um projeto .3mf do Creality Print 7 SEM abrir o programa
 Mantem malhas, posicoes e objetos intactos; muda so o Metadata/project_settings.config.
 
 Uso:
-  python3 alterar_config_3mf.py ENTRADA.3mf SAIDA.3mf '{"wall_loops":"4","outer_wall_speed":["80"]}' [--sem-altura-variavel]
+  uv run .claude/skills/creality-print-3mf/alterar_config_3mf.py ENTRADA.3mf SAIDA.3mf --config mudancas.json [--sem-altura-variavel]
+  (o JSON tambem pode vir escrito na linha, depois da SAIDA: '{"wall_loops":"4"}'; no PowerShell use sempre o arquivo)
 
 - Cada chave alterada e registrada no grupo certo de different_settings_to_system
   ([0] processo, [1] filamento, [2] impressora).
-- Chaves de filamento geram AVISO (regra: so mudar com autorizacao do Alexandre).
+- Chaves de filamento geram AVISO (regra: so mudar com autorizacao de quem pediu).
 - --sem-altura-variavel remove Metadata/layer_heights_profile.txt (necessario para suporte Organic).
 """
-import json, sys, zipfile
+import argparse, json, sys, zipfile
+from pathlib import Path
 
-FILAMENTO = ("filament_", "nozzle_temperature", "hot_plate", "textured_plate", "cool_plate", "eng_plate",
-             "pressure_advance", "enable_pressure", "fan_", "close_fan", "slow_down", "overhang_fan",
-             "additional_cooling", "support_material_interface_fan", "full_fan", "reduce_fan",
-             "chamber_temperature", "material_flow", "enable_filament")
-IMPRESSORA = ("nozzle_diameter", "max_layer_height", "min_layer_height", "retraction_", "deretraction_",
-              "z_hop", "retract_", "wipe", "curr_bed_type", "printer_", "machine_", "travel_slope")
-
-
-def grupo(k):
-    if k.startswith(FILAMENTO):
-        return 1
-    if k.startswith(IMPRESSORA) or k == "wipe_distance":
-        return 2
-    return 0
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ferramentas"))
+import k1comum
 
 
 def main():
-    # o console do Windows usa cp1252 e quebrava no "✓"
-    for f in (sys.stdout, sys.stderr):
-        f.reconfigure(encoding="utf-8", errors="replace")
-    src, dst, mudancas = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
-    sem_var = "--sem-altura-variavel" in sys.argv
-    zin = zipfile.ZipFile(src)
-    s = json.loads(zin.read("Metadata/project_settings.config"))
-    diff = s["different_settings_to_system"]
-    grupos = [[k for k in diff[i].split(";") if k] for i in range(3)]
-    for k, v in mudancas.items():
-        if k not in s:
-            raise SystemExit(f"chave inexistente nesta versao: {k}")
-        if isinstance(s[k], list) and not isinstance(v, list):
-            v = [v] * len(s[k])
-        g = grupo(k)
-        if g == 1:
-            print(f"AVISO: {k} e configuracao de FILAMENTO")
-        print(f"{k}: {s[k]} -> {v}")
-        s[k] = v
-        if k not in grupos[g]:
-            grupos[g].append(k)
-    for i in range(3):
-        diff[i] = ";".join(grupos[i])
-
-    zout = zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED)
-    for item in zin.infolist():
-        if sem_var and item.filename == "Metadata/layer_heights_profile.txt":
-            print("removida altura de camada variavel")
-            continue
-        data = zin.read(item.filename)
-        if item.filename == "Metadata/project_settings.config":
-            data = json.dumps(s, indent=4, ensure_ascii=False).encode()
-        # ZipInfo novo: reaproveitar o `item` do zip de entrada muda o offset dele
-        # e a releitura de `zin` depois dava "Bad magic number for file header".
-        info = zipfile.ZipInfo(item.filename, item.date_time)
-        info.compress_type = zipfile.ZIP_DEFLATED
-        info.external_attr = item.external_attr
-        zout.writestr(info, data)
-    zout.close()
-    zin.close()
+    k1comum.saida_utf8()
+    ap = argparse.ArgumentParser(description="Altera configuracoes de um .3mf do Creality Print 7 (malhas intactas).")
+    ap.add_argument("entrada")
+    ap.add_argument("saida")
+    ap.add_argument("mudancas", nargs="?", help="JSON com as chaves a alterar")
+    ap.add_argument("--config", dest="arquivo", help="arquivo .json com as chaves a alterar")
+    ap.add_argument("--sem-altura-variavel", action="store_true")
+    a = ap.parse_args()
+    src, dst, sem_var = a.entrada, a.saida, a.sem_altura_variavel
+    mudancas = k1comum.ler_json(a.mudancas, a.arquivo, None)
+    if mudancas is None and not sem_var:
+        ap.error("informe as mudancas (JSON na linha ou --config arquivo.json) ou --sem-altura-variavel")
+    k1comum.exigir_saida_diferente(src, dst)
+    with zipfile.ZipFile(src) as zin:
+        s = json.loads(zin.read("Metadata/project_settings.config"))
+        tem_var = "Metadata/layer_heights_profile.txt" in zin.namelist()
+    k1comum.aplicar_mudancas(s, mudancas or {})
+    remover = ()
+    if sem_var and tem_var:
+        remover = ("Metadata/layer_heights_profile.txt",)
+        print("removida altura de camada variavel")
+    k1comum.copiar_zip(src, dst, {"Metadata/project_settings.config":
+                                  json.dumps(s, indent=4, ensure_ascii=False).encode()}, remover)
 
     # conferencia, com os dois zips reabertos do zero
     with zipfile.ZipFile(src) as za, zipfile.ZipFile(dst) as zc:
-        assert zc.testzip() is None
         for n in za.namelist():
-            if n == "Metadata/project_settings.config" or (sem_var and n == "Metadata/layer_heights_profile.txt"):
+            if n == "Metadata/project_settings.config" or n in remover:
                 continue
-            assert za.read(n) == zc.read(n), f"arquivo mudou sem querer: {n}"
+            if za.read(n) != zc.read(n):
+                raise SystemExit(f"arquivo mudou sem querer: {n}")
         c = json.loads(zc.read("Metadata/project_settings.config"))
     for k in ["printer_settings_id", "nozzle_diameter", "filament_settings_id", "nozzle_temperature",
               "hot_plate_temp", "filament_flow_ratio", "pressure_advance", "layer_height", "enable_support",

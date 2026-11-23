@@ -1,3 +1,11 @@
+# Texto sempre com fim de linha LF, no Windows e no macOS (evita o arquivo inteiro aparecer como alterado)
+* text=auto eol=lf
+*.3mf binary
+*.stl binary
+*.zip binary
+*.png binary
+*.creality_printer binary
+
 # Arquivos grandes das peças que nós mesmos projetamos vão pelo Git LFS
 pecas/**/*.3mf filter=lfs diff=lfs merge=lfs -text
 pecas/**/*.stl filter=lfs diff=lfs merge=lfs -text

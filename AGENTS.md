@@ -28,7 +28,8 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `projetos-base/` | Projetos `.3mf` de referência (por bico e filamento) usados como `MODELO`/`CONFIG` na geração |
 | `filamentos/` | Uma pasta por filamento calibrado: `perfil.md`, `perfil.json` e o preset `.json` para importar |
 | `pecas/` | Uma pasta por peça com `README.md` de registro (config aprovada, resultado, lições); peças nossas via Git LFS, modelos de terceiros em `local/` (ignorada) |
-| `requirements.txt` | Bibliotecas Python dos scripts e da análise de malha |
+| `pyproject.toml` e `uv.lock` | Bibliotecas Python dos scripts, com versões fixadas; tudo roda com `uv run` |
+| `ferramentas/k1comum.py` | O que os scripts têm em comum nos dois sistemas (pastas, Creality Print, cópia de `.3mf`, grupos de chaves) |
 | `.claude/rules/fluxo-git.md` | Fluxo de trabalho com Git: branch por assunto e PR, nada direto na `main` |
 
 ## Quando usar o quê
@@ -49,24 +50,23 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 - **Git:** nada de commit direto na `main`. Antes de editar um arquivo do repositório, crie uma branch do assunto (`peca/`, `skill/`, `fix/`, `perfil/`, `docs/`) a partir da `main` atualizada, e entregue por PR. Detalhes em `.claude/rules/fluxo-git.md`.
 
 ## Ambientes por pessoa
-Antes de salvar ou rodar algo, identifique **em qual computador** a sessão está (`uname`, caminho do repositório). Não use o caminho de um no computador do outro.
+Antes de salvar ou rodar algo, identifique **em qual computador** a sessão está (plataforma informada no ambiente da sessão e caminho do repositório). Não use o caminho de um no computador do outro.
 
 | | Alexandre | Marcelo |
 |---|---|---|
 | Sistema | Windows | macOS |
 | Pasta de entrega | `C:\Users\alemg\Downloads` | `~/Downloads` (`/Users/marcelosander/Downloads`) |
-| Python | 3.12 só para o usuário (20/11/2026), em `C:\Users\alemg\AppData\Local\Programs\Python\Python312\python.exe` (detalhes abaixo) | `.venv` do repositório (`.venv/bin/python`) |
+| Python | `uv run <script>` (igual nos dois) | `uv run <script>` (igual nos dois) |
 | Creality Print | 7.x, perfis em `AppData\Roaming\Creality` (não editar direto) | instalado em `/Applications/Creality Print.app` |
 | Modelagem | Fusion 360 e SolidCraft (com MCP) | SolidCraft 0.30.1 com MCP (escopo local do projeto) |
 
-**PC do Alexandre (Windows):**
-- O comando `python` do PATH ainda abre a Microsoft Store: use o caminho completo.
-- Pacotes (instalados com `pip --user`): `trimesh`, `numpy`, `manifold3d`, `fast_simplification`, `scipy`, `matplotlib`, `rtree`, `networkx`, `shapely`.
-- Rode com `-P` (não `-I`, que esconde os pacotes do usuário): `& "<python.exe>" -P script.py`.
-
-**Mac do Marcelo:**
-- Primeira vez: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`.
-- Rode os scripts com o Python do `.venv`, por exemplo `.venv/bin/python .claude/skills/creality-print-3mf/gerar_projeto_creality.py ...`.
+**Python: um comando só, igual no Windows e no macOS**
+- Rode tudo com o [uv](https://docs.astral.sh/uv/), **da raiz do repositório**: `uv run .claude/skills/creality-print-3mf/gerar_projeto_creality.py ...`. Código solto: `uv run python -c "..."`. Testes: `uv run pytest`.
+- O `uv` cria o `.venv` e instala as versões do `uv.lock` sozinho na primeira vez. Não use `python`, `python3`, `pip` nem o caminho do `.venv` direto: no Windows o `python` do PATH abre a Microsoft Store, e no Mac o `python3` é o do Homebrew, sem os pacotes.
+- Instalar o `uv` (uma vez): no Windows, `winget install astral-sh.uv`; no macOS, `brew install uv`.
+- Biblioteca nova: `uv add <pacote>` (atualiza `pyproject.toml` e `uv.lock`; os dois arquivos vão no commit).
+- **JSON na linha de comando:** no PowerShell as aspas se perdem. Grave o JSON num arquivo e passe o arquivo (`--config`, `--caixas`); funciona em qualquer shell.
+- Pasta de entrega e Creality Print: os scripts acham sozinhos (`ferramentas/k1comum.py`). Para trocar, defina `K1_ENTREGA` ou `K1_CREALITY_EXE`.
 
 Nos dois: os perfis do Creality não são editados diretamente; entregue perfis como pacote `.creality_printer` para importar.
 

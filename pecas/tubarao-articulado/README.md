@@ -10,7 +10,7 @@
 ## Arquivos (locais, fora do git)
 - `local/ArticulatedSkeletonShark_BambuStudioX1C.3mf`: original do Bambu Studio.
 - `local/TubaraoArticulado_PLA_bico0.4.3mf`: projeto do Creality Print aprovado. Para refazer o G-code:
-  `.venv/bin/python .claude/skills/creality-print-3mf/fatiar_3mf.py pecas/tubarao-articulado/local/TubaraoArticulado_PLA_bico0.4.3mf --nome TubaraoArticulado --permitir-versao-nova`
+  `uv run .claude/skills/creality-print-3mf/fatiar_3mf.py pecas/tubarao-articulado/local/TubaraoArticulado_PLA_bico0.4.3mf --nome TubaraoArticulado --permitir-versao-nova`
   (a flag só é necessária enquanto o Mac tiver o Creality Print 7.2 e o projeto for da 7.3).
 
 ## Peças

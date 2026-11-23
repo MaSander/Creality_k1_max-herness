@@ -7,7 +7,7 @@ Os perfis de filamento, bico (impressora) e processo do Alexandre ficam salvos n
 |---|---|
 | `perfis_creality_7.3.zip` | **Todos os perfis num arquivo só.** É o mais fácil de importar. |
 | `creality-print-7.3/machine/` | Impressora com bico 0,2 (`Creality K1 Max 0.2 nozzle`) |
-| `creality-print-7.3/filament/` | PLA FLEXYGREEN e PETG MASTERPRINT (bico 0,4 e versões `@… 0.2 nozzle`), CR-PETG e Hyper PLA para o bico 0,2 |
+| `creality-print-7.3/filament/` | PLA FLEXYGREEN e PETG MASTERPRINT (bico 0,4 e versões `@… 0.2 nozzle`) |
 | `creality-print-7.3/process/` | 0.08mm Detalhe Miniaturas (0,2), 0.10mm Standard (0,2), 0.20mm PLA FLEXY 0.07 tolerancia furo, PEÇA DELICADA M5 |
 | `K1_Max_bico_0.2_Alexandre.creality_printer` | Pacote antigo só do bico 0,2 (18/11). O zip acima é mais completo e mais novo. |
 

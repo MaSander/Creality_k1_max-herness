@@ -55,14 +55,16 @@ description: Como ler, revisar, gerar e alterar projetos .3mf do Creality Print 
    - releia a malha de `object_1.model`: dimensões e se está fechada;
    - imprima as chaves do checklist (impressora, bico, filamento, temperaturas, flow, PA, brim gap, compensação de pé de elefante, suporte).
 
-```bash
-# no Mac: .venv/bin/python no lugar de python3 (veja AGENTS.md)
-python3 gerar_projeto_creality.py MODELO.3mf CONFIG.3mf peca.stl SAIDA.3mf "Nome" \
-  '{"layer_height":"0.12","wall_loops":"3","brim_object_gap":"0","elefant_foot_compensation":"0"}'
+Grave as chaves num arquivo `.json` (funciona igual no PowerShell e no bash) e rode da raiz do repositório:
 ```
+uv run .claude/skills/creality-print-3mf/gerar_projeto_creality.py MODELO.3mf CONFIG.3mf peca.stl SAIDA.3mf "Nome" --config mudancas.json
+```
+`mudancas.json`: `{"layer_height":"0.12","wall_loops":"3","brim_object_gap":"0","elefant_foot_compensation":"0"}`
+
+O script recusa SAIDA igual ao MODELO ou ao CONFIG e registra cada chave no grupo certo (processo, filamento ou impressora).
 
 ## Cuidado técnico com o zipfile do Python
-`zout.writestr(item, data)` reaproveitando o `ZipInfo` do arquivo de entrada **altera o offset dele**. Ler o ZIP de entrada depois disso dá "Bad magic number for file header". O arquivo de saída fica correto. Para não ter o erro, crie um `ZipInfo` novo para cada arquivo e confira reabrindo os dois ZIPs do zero; o `alterar_config_3mf.py` já faz assim desde 22/11/2026.
+`zout.writestr(item, data)` reaproveitando o `ZipInfo` do arquivo de entrada **altera o offset dele**. Ler o ZIP de entrada depois disso dá "Bad magic number for file header". O arquivo de saída fica correto. Para não ter o erro, crie um `ZipInfo` novo para cada arquivo e confira reabrindo os dois ZIPs do zero. É o que faz o `copiar_zip` de `ferramentas/k1comum.py`, usado pelos três scripts desta pasta: ao escrever um script novo que grave `.3mf`, use essa função.
 
 ## Revisar um projeto salvo por ele
 - Compare `project_settings.config` com a versão anterior e liste as chaves que mudaram.
@@ -76,10 +78,11 @@ Use `alterar_config_3mf.py` (nesta pasta) para mudar processo, suporte, brim, fi
 - avisa quando uma chave é de filamento;
 - confere o resultado no final.
 
-```bash
-python3 alterar_config_3mf.py ENTRADA.3mf SAIDA.3mf '{"wall_loops":"4","outer_wall_speed":"80"}'
-python3 alterar_config_3mf.py ENTRADA.3mf SAIDA.3mf '{"support_style":"organic"}' --sem-altura-variavel
 ```
+uv run .claude/skills/creality-print-3mf/alterar_config_3mf.py ENTRADA.3mf SAIDA.3mf --config mudancas.json
+uv run .claude/skills/creality-print-3mf/alterar_config_3mf.py ENTRADA.3mf SAIDA.3mf --config mudancas.json --sem-altura-variavel
+```
+`mudancas.json`: `{"wall_loops":"4","outer_wall_speed":"80"}`. SAIDA tem de ser um arquivo diferente da ENTRADA.
 
 Mudanças que se fazem com frequência (JSON):
 
@@ -99,10 +102,10 @@ Depois de editar, quem pediu abre o .3mf no Creality e fatia. O programa respeit
 ### Sem abrir o programa
 Use `adicionar_bloqueador_3mf.py` (nesta pasta). As caixas são informadas em coordenadas da **mesa**, como no fatiador (0 a 300 mm).
 
-```bash
-python3 adicionar_bloqueador_3mf.py ENTRADA.3mf SAIDA.3mf \
-  '[{"nome":"Bloqueador bico frontal","min":[145,173,0],"max":[162,181,3.6]}]' [--tipo support_enforcer]
 ```
+uv run .claude/skills/creality-print-3mf/adicionar_bloqueador_3mf.py ENTRADA.3mf SAIDA.3mf --caixas caixas.json [--tipo support_enforcer]
+```
+`caixas.json`: `[{"nome":"Bloqueador bico frontal","min":[145,173,0],"max":[162,181,3.6]}]`. O script recusa caixa fora da mesa.
 
 **Estrutura de um objeto com várias partes** (copiada do projeto real dele, `1_esteira.3mf`):
 - **`3D/Objects/object_N.model`:** vários `<object>`. A peça é `type="model"`; bloqueadores, modificadores e partes negativas são `type="other"`.
@@ -147,7 +150,7 @@ Os nomes podem variar um pouco entre versões. Confirme com captura de tela se h
 ## Fatiar sem abrir o programa (linha de comando) – testado em 20/11/2026
 `fatiar_3mf.py` chama o próprio Creality Print (`--slice`) e usa **as configurações gravadas no .3mf**. Ele não usa perfis soltos, então o G-code sai como o programa geraria com o mesmo projeto aberto. A comparação de 585 chaves entre o .3mf e o G-code não mostrou diferenças reais.
 ```
-.venv/bin/python .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf [--saida ~/Downloads] [--nome peca]
+uv run .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf [--saida PASTA] [--nome peca]
 ```
 - Saída: `<nome>_bico<d>_<filamento>_<tempo>.gcode`, com miniaturas 96 e 300 px embutidas. O CLI não renderiza miniatura: ele usa o `Metadata/plate_1.png` que já está no `.3mf`. Projetos do `gerar_projeto_creality.py` já trazem a imagem da peça nova; num `.3mf` editado de outro jeito, confira se a miniatura é da peça certa. O resumo mostra bico, filamento, temperaturas, camada, suporte, brim, tempo e gramas.
 - **Versão:** o Mac tem o Creality Print **7.2.2**, e os projetos do Alexandre são salvos no **7.3**. O CLI recusa arquivo mais novo. O script para e avisa, e só fatia com `--permitir-versao-nova` (opções novas podem ser ignoradas). O melhor é deixar os dois computadores na mesma versão.
@@ -164,14 +167,15 @@ Os nomes podem variar um pouco entre versões. Confirme com captura de tela se h
 
 ## Acesso aos arquivos por computador
 
+Nos dois: Python com `uv run`, da raiz do repositório (veja "Ambientes por pessoa" no `AGENTS.md`).
+
 ### Mac do Marcelo
-- Pasta de entrega: `~/Downloads`. Python: `.venv/bin/python` na raiz do repositório (com `requirements.txt` instalado).
+- Pasta de entrega: `~/Downloads`.
 - Creality Print em `/Applications/Creality Print.app`; os perfis de usuário também não são editados direto: entregue pacote para importar.
 
 ### PC do Alexandre (Windows)
 - Pasta conectada: `C:\Users\alemg\Downloads`. Use stage e commit pela ponte com o computador.
 - A pasta `AppData\Roaming\Creality` (perfis) não está liberada. Entregue perfis como pacote para importar.
-- **Python no PC dele:** veja "Ambientes por pessoa" no `AGENTS.md` (caminho completo e opção `-P`).
 
 ### Nos dois computadores: gravar a malha no .3mf
 - Escreva as coordenadas com precisão de float32 (`{:.9g}`). Com 5 a 7 casas fixas, vértices quase coincidentes se fundem e a malha abre (esquiador, 20/11/2026).

@@ -7,3 +7,6 @@ __pycache__/
 # Peças: arquivos de terceiros (licença sem redistribuição) e saídas que se geram de novo
 pecas/**/local/
 *.gcode
+Thumbs.db
+desktop.ini
+.pytest_cache/

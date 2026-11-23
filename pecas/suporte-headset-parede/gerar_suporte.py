@@ -10,7 +10,7 @@ Sistema de coordenadas = orientação de impressão:
   X = horizontal ao longo da parede, Y = para cima (em uso), Z = saindo da parede
   (na impressão, Z é a altura: a placa fica deitada na mesa).
 
-Uso:  .venv/bin/python pecas/suporte-headset-parede/gerar_suporte.py [--versao 2] [--passo 0.6]
+Uso:  uv run pecas/suporte-headset-parede/gerar_suporte.py [--versao 2] [--passo 0.6]
 """
 import argparse
 import math

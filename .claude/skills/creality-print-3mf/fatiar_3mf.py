@@ -3,11 +3,11 @@
 Usa as configurações gravadas no próprio .3mf (impressora, processo, filamento, suporte, brim):
 o G-code sai igual ao que o programa geraria com o mesmo projeto aberto.
 
-Saída: <pasta>/<nome>_<filamento>_bico<d>_<tempo>.gcode, com miniatura embutida
+Saída: <pasta>/<nome>_bico<d>_<filamento>_<tempo>.gcode, com miniatura embutida
 (a imagem da placa gerada pelo fatiador), para a peça aparecer na tela da K1 Max.
 
-Uso (Mac do Marcelo):
-  .venv/bin/python .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf [--saida ~/Downloads]
+Uso (só no macOS: o Creality Print 7.3 do Windows não tem linha de comando):
+  uv run .claude/skills/creality-print-3mf/fatiar_3mf.py projeto.3mf [--saida PASTA]
 Opções:
   --nome NOME                 nome base do arquivo (padrão: nome do .3mf)
   --placa N                   placa a fatiar (padrão 1)
@@ -18,7 +18,6 @@ Não envia nada para a impressora (isso é o enviar_k1max.py, que também não i
 """
 import argparse
 import base64
-import glob
 import io
 import os
 import platform
@@ -28,20 +27,14 @@ import subprocess
 import sys
 import tempfile
 import zipfile
+from pathlib import Path
 
-CANDIDATOS = {
-    "Darwin": ["/Applications/Creality Print.app/Contents/MacOS/CrealityPrint"],
-    "Windows": sorted(glob.glob(r"C:\Program Files\Creality\Creality Print*\CrealityPrint.exe"), reverse=True),
-}
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ferramentas"))
+import k1comum
 
 
 def achar_exe(exe):
-    if exe:
-        return exe
-    for c in CANDIDATOS.get(platform.system(), []):
-        if os.path.exists(c):
-            return c
-    sys.exit("Não achei o Creality Print. Passe o caminho com --exe.")
+    return k1comum.exe_creality(exe) or sys.exit("Não achei o Creality Print. Passe o caminho com --exe.")
 
 
 def versao_cli(exe):
@@ -109,12 +102,10 @@ def tempo_curto(t):
 
 
 def main():
-    # o console do Windows usa cp1252: sem isto os acentos saem quebrados
-    for f in (sys.stdout, sys.stderr):
-        f.reconfigure(encoding="utf-8", errors="replace")
-    ap =argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    k1comum.saida_utf8()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("projeto")
-    ap.add_argument("--saida", default=os.path.expanduser("~/Downloads"))
+    ap.add_argument("--saida", default=str(k1comum.pasta_entrega()))
     ap.add_argument("--nome")
     ap.add_argument("--placa", type=int, default=1)
     ap.add_argument("--exe")

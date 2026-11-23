@@ -22,7 +22,7 @@ CAD paramétrico, gratuito e open-source (Tangency Labs), o mesmo que o Alexandr
 
 **Ferramentas principais:** `list_commands` e `describe_command` (consulte antes de usar um comando novo, não chute argumentos), `execute`, `batch` (com rollback), `set_parameter`, `inspect_design`, `measure`, `body_topology`, `screenshot`, `export`, `save`.
 
-Se o MCP não estiver disponível, diga isso e pergunte se pode modelar com `manifold3d` no `.venv` (só para peças simples, sem histórico editável).
+Se o MCP não estiver disponível, diga isso e pergunte se pode modelar com `manifold3d` (script rodado com `uv run`) (só para peças simples, sem histórico editável).
 
 ## Fluxo
 1. **Requisitos** (pergunte o que faltar, em múltipla escolha):
@@ -33,7 +33,7 @@ Se o MCP não estiver disponível, diga isso e pergunte se pode modelar com `man
 3. **Modelar** em passos pequenos, conferindo com `inspect_design` e `measure` (caixa delimitadora e volume) a cada feature importante.
 4. **Prévia:** `screenshot` em vistas isométrica, frontal e superior. Mostre e **espere aprovação** antes de exportar.
 5. **Exportar** em mm: o `.sc` (fonte editável), um STEP e um STL. Nome: `<peca>_v<N>`.
-6. **Conferir a malha** com `.venv/bin/python` + trimesh: dimensões iguais às do CAD, `is_watertight`, `is_volume`, um corpo só (ou os corpos esperados).
+6. **Conferir a malha** com `uv run python` + trimesh: dimensões iguais às do CAD, `is_watertight`, `is_volume`, um corpo só (ou os corpos esperados).
    - O STL do SolidCraft vem com os vértices soltos por triângulo: carregue com `trimesh.load(...)` (que junta os vértices) antes de testar se está fechado. Com `process=False` ele parece aberto e com 1 corpo por triângulo.
    - Confira o volume de cada etapa no `measure` contra a sua conta (lição da peça de teste M3, 20/11/2026: chanfro, furos e porca bateram até 0,1 mm³).
 7. **Passar para o configurador** com: material, bico, orientação pensada no projeto e quais medidas são críticas.

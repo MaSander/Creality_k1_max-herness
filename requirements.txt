@@ -1,9 +1,0 @@
-trimesh
-numpy
-manifold3d
-scipy
-matplotlib
-shapely
-networkx
-rtree
-fast_simplification

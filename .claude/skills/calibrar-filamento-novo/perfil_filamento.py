@@ -3,7 +3,7 @@
 
 Guarda o estado de cada filamento em filamentos/<slug>/perfil.json, gera o
 perfil.md legível e exporta o preset de filamento para importar no Creality Print.
-Só biblioteca padrão (roda no .venv do Mac e no Python do PC do Alexandre).
+Só biblioteca padrão. Rode da raiz do repositório: uv run .claude/skills/calibrar-filamento-novo/perfil_filamento.py <comando>
 
 Uso:
   perfil_filamento.py listar
@@ -30,6 +30,8 @@ import unicodedata
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "ferramentas"))
+import k1comum
 PASTA = REPO / "filamentos"
 
 # Chaves do Creality Print que a calibração preenche, com nome legível e unidade.
@@ -159,8 +161,8 @@ def salvar(perfil: dict) -> Path:
     perfil["atualizado_em"] = hoje()
     pasta = PASTA / perfil["slug"]
     pasta.mkdir(parents=True, exist_ok=True)
-    (pasta / "perfil.json").write_text(json.dumps(perfil, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (pasta / "perfil.md").write_text(render_md(perfil), encoding="utf-8")
+    (pasta / "perfil.json").write_text(json.dumps(perfil, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    (pasta / "perfil.md").write_text(render_md(perfil), encoding="utf-8", newline="\n")
     return pasta
 
 
@@ -304,7 +306,7 @@ def cmd_exportar(a):
     if "pressure_advance" in b["parametros"]:
         preset["enable_pressure_advance"] = ["1"]
     destino = PASTA / perfil["slug"] / f"{nome}.json"
-    destino.write_text(json.dumps(preset, ensure_ascii=False, indent=4) + "\n", encoding="utf-8")
+    destino.write_text(json.dumps(preset, ensure_ascii=False, indent=4) + "\n", encoding="utf-8", newline="\n")
     salvar(perfil)
     print(f"Exportado: {destino}")
 
@@ -322,6 +324,7 @@ def cmd_calcular(a):
 
 
 def main():
+    k1comum.saida_utf8()
     p = argparse.ArgumentParser(description="Registro de calibração de filamento (K1 Max)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
