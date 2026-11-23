@@ -15,10 +15,10 @@ Antes de subir um modelo baixado, **confira a licença** (no MakerWorld, ela fic
 
 ## Backup das versões intermediárias (por enquanto)
 - **Marcelo:** Google Drive pessoal, pasta `3D/K1-Max/pecas/<nome-da-peca>/`, com o mesmo nome de arquivo de `local/`.
-- **Alexandre:** a definir.
+- **Alexandre:** a mesma pasta do Marcelo (`3D/K1-Max/pecas/<nome-da-peca>/`), compartilhada com ele como editor e com atalho no Meu Drive dele (no PC dele, `G:\Meu Drive\3D\K1-Max\pecas\`).
 - Ao trocar de versão, mova a anterior para `local/` (e para o backup) e deixe no git só a atual.
 
 ## Git LFS
 - Mac: `brew install git-lfs && git lfs install` (já feito no Mac do Marcelo em 21/11/2026).
 - Windows: já vem com o Git for Windows; rode `git lfs install` uma vez.
-- O armazenamento LFS conta na cota da conta dona do repositório (Alexandre).
+- O armazenamento LFS conta na cota da conta dona do repositório (Marcelo, desde 22/11/2026): 10 GB de armazenamento e 10 GB de download por mês no plano gratuito. Arquivo apagado **não** libera espaço no LFS.
