@@ -17,6 +17,8 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/skills/creality-print-3mf/gerar_projeto_creality.py` | Gera o `.3mf` de um **modelo novo** a partir de um projeto modelo + projeto de configuração |
 | `.claude/skills/creality-print-3mf/alterar_config_3mf.py` | Altera só as configurações de um **`.3mf` existente** (malhas intactas); `--sem-altura-variavel` para suporte Organic |
 | `.claude/skills/creality-print-3mf/adicionar_bloqueador_3mf.py` | Acrescenta caixas de **bloqueio ou reforço de suporte** a um objeto, em coordenadas da mesa |
+| `.claude/skills/creality-print-3mf/analisar_malha.py` | **Analisa uma malha** (STL, OBJ, GLB ou `.3mf`): fechada, corpos, cabe na mesa, área de contato e balanços; render das vistas |
+| `.claude/skills/creality-print-3mf/checklist_3mf.py` | Roda o **checklist de entrega** de um `.3mf` por código e sai com erro se houver falha |
 | `.claude/skills/creality-print-3mf/fatiar_3mf.py` | **Fatia** um `.3mf` pela linha de comando do Creality Print (G-code com bico e filamento no nome e miniatura) |
 | `.claude/skills/k1max-impressora/SKILL.md` | Conexão com a K1 Max sem root (IP 192.168.0.69): status e histórico (`k1max_status.py`) e **envio para a lista sem imprimir** (`enviar_k1max.py`) |
 | `.claude/skills/k1max-calibracao/SKILL.md` | Calibração (flow, PA, fluxo volumétrico, retração) e troca de bico 0,4/0,2 |
@@ -30,6 +32,8 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `pecas/` | Uma pasta por peça com `README.md` de registro (config aprovada, resultado, lições); peças nossas via Git LFS, modelos de terceiros em `local/` (ignorada) |
 | `pyproject.toml` e `uv.lock` | Bibliotecas Python dos scripts, com versões fixadas; tudo roda com `uv run` |
 | `ferramentas/k1comum.py` | O que os scripts têm em comum nos dois sistemas (pastas, Creality Print, cópia de `.3mf`, grupos de chaves) |
+| `ferramentas/k1malha.py` | Leitura de `.3mf` e de malhas e a análise de imprimibilidade usada pelos scripts |
+| `testes/` | Testes automatizados dos scripts (`uv run pytest`) |
 | `.claude/rules/fluxo-git.md` | Fluxo de trabalho com Git: branch por assunto e PR, nada direto na `main` |
 
 ## Quando usar o quê
@@ -45,7 +49,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 - Nunca afirmar algo que não aconteceu.
 - **Nunca iniciar impressão remotamente**: o arquivo vai para a lista, e quem está na máquina inicia pela tela.
 - PLA: lembrar da **tampa aberta**. Trocou o bico: **autoteste e nivelamento**.
-- Todo projeto entregue vai acompanhado do **checklist** do agente, verificado por código.
+- Todo projeto entregue vai acompanhado do **checklist** do agente, verificado por código (`checklist_3mf.py`).
 - Repositório **público**: não subir modelo de terceiros sem licença que permita redistribuir (veja `pecas/README.md`).
 - **Git:** nada de commit direto na `main`. Antes de editar um arquivo do repositório, crie uma branch do assunto (`peca/`, `skill/`, `fix/`, `perfil/`, `docs/`) a partir da `main` atualizada, e entregue por PR. Detalhes em `.claude/rules/fluxo-git.md`.
 
