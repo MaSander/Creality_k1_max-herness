@@ -5,16 +5,22 @@ sem abrir o programa. Estrutura copiada de um projeto real do Creality (partes e
 no object_N.model + component no 3dmodel.model + <part subtype=...> no model_settings.config).
 
 Uso:
-  python3 adicionar_bloqueador_3mf.py ENTRADA.3mf SAIDA.3mf CAIXAS_JSON [--tipo support_blocker|support_enforcer] [--objeto 1]
+  uv run .claude/skills/creality-print-3mf/adicionar_bloqueador_3mf.py ENTRADA.3mf SAIDA.3mf --caixas caixas.json \
+      [--tipo support_blocker|support_enforcer] [--objeto 1]
+  (o JSON tambem pode vir escrito na linha, depois da SAIDA; no PowerShell use sempre o arquivo)
 
-  CAIXAS_JSON: lista de caixas em coordenadas da MESA (mm, como no fatiador; mesa 0..300):
-    '[{"nome":"Bloqueador bico frontal","min":[145,173,0],"max":[162,181,3.6]}]'
+  JSON das caixas: lista em coordenadas da MESA (mm, como no fatiador; mesa 0..300):
+    [{"nome":"Bloqueador bico frontal","min":[145,173,0],"max":[162,181,3.6]}]
 
 Confira depois no Creality: os itens aparecem dentro do objeto na lista; ao fatiar, nao ha suporte na caixa.
 """
-import json, re, sys, zipfile
+import argparse, re, sys, zipfile
+from pathlib import Path
 
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ferramentas"))
+import k1comum
 
 
 def caixa_xml(oid, uuid, mn, mx, tipo_obj="other"):
@@ -28,16 +34,36 @@ def caixa_xml(oid, uuid, mn, mx, tipo_obj="other"):
 
 
 def main():
-    src, dst, caixas = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
-    tipo = sys.argv[sys.argv.index("--tipo") + 1] if "--tipo" in sys.argv else "support_blocker"
-    n_obj = sys.argv[sys.argv.index("--objeto") + 1] if "--objeto" in sys.argv else "1"
+    k1comum.saida_utf8()
+    ap = argparse.ArgumentParser(description="Adiciona caixas de bloqueio ou reforco de suporte a um .3mf.")
+    ap.add_argument("entrada")
+    ap.add_argument("saida")
+    ap.add_argument("caixas", nargs="?", help="JSON com a lista de caixas")
+    ap.add_argument("--caixas", dest="arquivo", help="arquivo .json com a lista de caixas")
+    ap.add_argument("--tipo", default="support_blocker", choices=["support_blocker", "support_enforcer"])
+    ap.add_argument("--objeto", default="1")
+    a = ap.parse_args()
+    src, dst, tipo, n_obj = a.entrada, a.saida, a.tipo, a.objeto
+    caixas = k1comum.ler_json(a.caixas, a.arquivo, None)
+    if not caixas:
+        ap.error("informe as caixas (JSON na linha ou --caixas arquivo.json)")
+    k1comum.exigir_saida_diferente(src, dst)
+    for c in caixas:
+        fora = [i for i in range(3) if c["min"][i] < 0 or c["max"][i] > k1comum.MESA[i] or c["min"][i] >= c["max"][i]]
+        if fora:
+            raise SystemExit(f"caixa fora da mesa (0..300 mm) ou com min >= max: {c}")
     path = f"3D/Objects/object_{n_obj}.model"
-    z = zipfile.ZipFile(src)
-    obj = z.read(path).decode()
-    m3 = z.read("3D/3dmodel.model").decode()
-    ms = z.read("Metadata/model_settings.config").decode()
+    with zipfile.ZipFile(src) as z:
+        if path not in z.namelist():
+            raise SystemExit(f"o projeto nao tem {path} (confira --objeto)")
+        obj = z.read(path).decode()
+        m3 = z.read("3D/3dmodel.model").decode()
+        ms = z.read("Metadata/model_settings.config").decode()
 
-    comp = re.search(rf'<component p:path="/{re.escape(path)}"[^>]*/>', m3).group(0)
+    achado = re.search(rf'<component p:path="/{re.escape(path)}"[^>]*/>', m3)
+    if not achado:
+        raise SystemExit(f"nao achei o componente de {path} no 3dmodel.model")
+    comp = achado.group(0)
     comp_t = np.array(list(map(float, re.search(r'transform="([^"]+)"', comp).group(1).split())))
     wrapper = re.search(r'<object id="(\d+)"[^>]*>\s*<components>\s*' + re.escape(comp), m3).group(1)
     item_t = np.array(list(map(float, re.search(rf'<item objectid="{wrapper}"[^>]*transform="([^"]+)"', m3).group(1).split())))
@@ -66,15 +92,8 @@ def main():
     last_part = ms.rindex("</part>", i, j) + len("</part>")
     ms = ms[:last_part] + parts + ms[last_part:]
 
-    zo = zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED)
-    for it in z.infolist():
-        data = z.read(it.filename)
-        if it.filename == path: data = obj.encode()
-        elif it.filename == "3D/3dmodel.model": data = m3.encode()
-        elif it.filename == "Metadata/model_settings.config": data = ms.encode()
-        zo.writestr(it, data)
-    zo.close()
-    assert zipfile.ZipFile(dst).testzip() is None
+    k1comum.copiar_zip(src, dst, {path: obj.encode(), "3D/3dmodel.model": m3.encode(),
+                                  "Metadata/model_settings.config": ms.encode()})
     print(f"ok: {len(caixas)} caixa(s) {tipo} no objeto {wrapper} -> {dst}")
 
 

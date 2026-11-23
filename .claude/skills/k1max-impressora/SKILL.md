@@ -11,10 +11,10 @@ description: Ler status (temperaturas, progresso, erro) e histórico de impress�
 ## Script
 `k1max_status.py` (só biblioteca padrão):
 ```
-.venv/bin/python .claude/skills/k1max-impressora/k1max_status.py status
-.venv/bin/python .claude/skills/k1max-impressora/k1max_status.py historico --n 10
+uv run .claude/skills/k1max-impressora/k1max_status.py status
+uv run .claude/skills/k1max-impressora/k1max_status.py historico --n 10
 ```
-No PC do Alexandre, use o Python completo com `-P` (ver AGENTS.md).
+Rode da raiz do repositório; o comando é o mesmo no Windows e no macOS.
 
 ## O que dá e o que não dá para saber (testado em 20/11/2026)
 | Dá | Não dá |
@@ -28,7 +28,7 @@ O nome do G-code costuma trazer o filamento (`..._PLA_...`), mas isso é só uma
 ## Enviar para a lista de arquivos (sem imprimir) – testado em 20/11/2026
 `enviar_k1max.py` faz o mesmo que o botão de enviar arquivo do Creality Print: `POST http://IP/upload/<nome>` (porta 80, campo `file`, **sem root**). O arquivo vai para `/usr/data/printer_data/gcodes/` e aparece na tela. **Não inicia a impressão**: iniciar é outro comando (WebSocket `opGcodeFile: "printprt:<caminho>"`), que o script não tem.
 ```
-.venv/bin/python .claude/skills/k1max-impressora/enviar_k1max.py ~/Downloads/peca_bico0.4_PLA_1h20m.gcode
+uv run .claude/skills/k1max-impressora/enviar_k1max.py ~/Downloads/peca_bico0.4_PLA_1h20m.gcode
 ```
 - Recusa se a impressora estiver imprimindo ou pausada (`--mesmo-imprimindo` para forçar), se já existir arquivo com o mesmo nome (`--sobrescrever`) e se o arquivo não for um G-code do Creality Print.
 - Depois do envio, confere na lista da impressora se o arquivo chegou com o tamanho certo.
@@ -37,8 +37,8 @@ O nome do G-code costuma trazer o filamento (`..._PLA_...`), mas isso é só uma
 ## Listar e apagar arquivos da impressora – testado em 20/11/2026
 `arquivos_k1max.py` usa o mesmo comando do Creality Print (WebSocket 9999, `opGcodeFile: "deleteprt:<caminho>"`).
 ```
-.venv/bin/python .claude/skills/k1max-impressora/arquivos_k1max.py listar
-.venv/bin/python .claude/skills/k1max-impressora/arquivos_k1max.py apagar "nome exato.gcode"
+uv run .claude/skills/k1max-impressora/arquivos_k1max.py listar
+uv run .claude/skills/k1max-impressora/arquivos_k1max.py apagar "nome exato.gcode"
 ```
 - Apagar **só com pedido explícito** e só pelo nome exato. O script recusa o arquivo em uso na impressão e confere depois se ele sumiu da lista.
 
@@ -54,13 +54,12 @@ A K1 Max detecta falha (peça solta, "espaguete") pela câmera, mas **só com a 
 | `aiPausePrint` | pausa sozinha quando detecta |
 | `aiFirstFloor` | confere a 1ª camada (só no início da impressão) |
 
-Para ligar, use o mesmo comando do Creality Print (WebSocket 9999, `{"method":"set","params":{"<campo>":1}}`), **com a impressora parada**, e depois confira no `bruto` se o campo ficou em 1:
+Para ver os quatro campos e para ligar (mesmo comando do Creality Print: WebSocket 9999, `{"method":"set","params":{"<campo>":1}}`):
 ```
-cd .claude/skills/k1max-impressora && ../../../.venv/bin/python -c "
-from k1max_status import IP_PADRAO, _ws_get
-for k in ('aiSw','aiDetection','aiPausePrint','aiFirstFloor'): _ws_get(IP_PADRAO, {'method':'set','params':{k:1}}, duracao=2)"
-../../../.venv/bin/python k1max_status.py bruto | grep '"ai'
+uv run .claude/skills/k1max-impressora/k1max_status.py ia
+uv run .claude/skills/k1max-impressora/k1max_status.py ia --ligar
 ```
+O `--ligar` recusa com a impressora imprimindo ou pausada e confere no final se os campos ficaram em 1.
 - Mexa nisso só com pedido. Também dá para ligar pela tela, em Configurações, na opção de detecção por IA.
 - A IA não pega tudo: nas peças grandes, vale olhar as primeiras camadas mesmo assim.
 

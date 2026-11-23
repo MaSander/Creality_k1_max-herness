@@ -10,5 +10,5 @@ Uma pasta por filamento, criada e mantida pela skill `calibrar-filamento-novo` (
 
 Ver tudo o que já foi calibrado:
 ```
-.venv/bin/python .claude/skills/calibrar-filamento-novo/perfil_filamento.py listar
+uv run .claude/skills/calibrar-filamento-novo/perfil_filamento.py listar
 ```

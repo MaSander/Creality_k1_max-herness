@@ -1,0 +1,26 @@
+[project]
+name = "k1max-harness"
+version = "0.1.0"
+description = "Scripts do harness da Creality K1 Max (rodar com: uv run <script>)"
+requires-python = ">=3.12"
+dependencies = [
+    "trimesh",
+    "numpy",
+    "manifold3d",
+    "scipy",
+    "matplotlib",
+    "shapely",
+    "networkx",
+    "rtree",
+    "fast_simplification",
+    "pillow",
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["testes"]
