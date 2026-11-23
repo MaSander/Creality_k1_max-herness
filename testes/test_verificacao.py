@@ -180,3 +180,28 @@ def test_ficha_nao_e_gravada_para_malha_reprovada(tmp_path):
     r = rodar("analisar_malha.py", stl, "--gravar-ficha", ficha, "--peca", "x", "--uso", "x", "--material", "PLA",
               "--bico", "0.4")
     assert r.returncode == 1 and not ficha.exists()
+
+
+sys.path.insert(0, str(RAIZ / "ferramentas"))
+import k1comum  # noqa: E402
+
+
+@pytest.mark.skipif(not k1comum.exe_orca(), reason="OrcaSlicer não instalado")
+def test_fatiar_com_orcaslicer(tmp_path, projeto_cubo):
+    r = rodar("fatiar_3mf.py", projeto_cubo, "--saida", tmp_path, "--fatiador", "orca")
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "EXPERIMENTAL" in r.stdout
+    gcodes = list(tmp_path.glob("*_orca_*.gcode"))
+    assert len(gcodes) == 1
+    texto = gcodes[0].read_text(encoding="utf-8", errors="ignore")
+    assert "thumbnail begin" in texto and "START_PRINT EXTRUDER_TEMP=215 BED_TEMP=50" in texto
+
+
+@pytest.mark.skipif(not k1comum.exe_creality() or k1comum.SISTEMA == "Windows",
+                    reason="Creality Print com linha de comando só no macOS")
+def test_fatiar_com_creality_print(tmp_path, projeto_cubo):
+    r = rodar("fatiar_3mf.py", projeto_cubo, "--saida", tmp_path, "--permitir-versao-nova")
+    assert r.returncode == 0, r.stdout + r.stderr
+    gcodes = list(tmp_path.glob("*.gcode"))
+    assert len(gcodes) == 1 and "_orca" not in gcodes[0].name
+    assert "thumbnail begin" in gcodes[0].read_text(encoding="utf-8", errors="ignore")

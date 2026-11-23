@@ -13,6 +13,9 @@ Opções:
   --placa N                   placa a fatiar (padrão 1)
   --exe CAMINHO               executável do Creality Print (padrão: procura nos lugares de costume)
   --permitir-versao-nova      aceita .3mf salvo numa versão do Creality Print mais nova que a instalada
+  --fatiador creality|orca    programa que fatia (padrão: creality). "orca" usa o OrcaSlicer e é
+                              EXPERIMENTAL: ainda não foi validado por impressão (veja a skill).
+                              O arquivo sai com "_orca" no nome.
 
 Não envia nada para a impressora (isso é o enviar_k1max.py, que também não imprime).
 """
@@ -33,13 +36,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ferramentas"))
 import k1comum
 
 
-def achar_exe(exe):
+def achar_exe(exe, fatiador="creality"):
+    if fatiador == "orca":
+        return k1comum.exe_orca(exe) or sys.exit("Não achei o OrcaSlicer. Passe o caminho com --exe "
+                                                 "ou defina K1_ORCA_EXE.")
     return k1comum.exe_creality(exe) or sys.exit("Não achei o Creality Print. Passe o caminho com --exe.")
 
 
 def versao_cli(exe):
     r = subprocess.run([exe, "--help"], capture_output=True, text=True, errors="ignore", timeout=60)
-    m = re.search(r"Creality-(\d+(?:\.\d+)+)", r.stdout + r.stderr)
+    m = re.search(r"(?:Creality|OrcaSlicer)-(\d+(?:\.\d+)+)", r.stdout + r.stderr)
     return m.group(1) if m else "?"
 
 
@@ -110,19 +116,23 @@ def main():
     ap.add_argument("--placa", type=int, default=1)
     ap.add_argument("--exe")
     ap.add_argument("--permitir-versao-nova", action="store_true")
+    ap.add_argument("--fatiador", choices=["creality", "orca"], default="creality")
     a = ap.parse_args()
+    orca = a.fatiador == "orca"
 
     projeto = os.path.abspath(a.projeto)
-    if platform.system() == "Windows" and not a.exe:
+    if platform.system() == "Windows" and not a.exe and not orca:
         # Testado em 22/11/2026 no PC do Alexandre (Creality Print 7.3): o CrealityPrint.exe do
         # Windows não tem modo linha de comando. "--help" trava, "--export-3mf" dá
         # "GUI parameter parsing failed" e "--slice" abre a janela do programa sem fatiar.
         sys.exit("No Windows o Creality Print 7.3 não fatia pela linha de comando (abre a janela).\n"
                  "Fatie no programa: abra o .3mf, Slice plate e Export G-code.\n"
+                 "Alternativa experimental: --fatiador orca (OrcaSlicer instalado).\n"
                  "Para tentar outro executável mesmo assim, passe --exe.")
-    exe = achar_exe(a.exe)
+    exe = achar_exe(a.exe, a.fatiador)
     v_cli, v_arq = versao_cli(exe), versao_3mf(projeto)
-    versao_nova = tupla(v_arq)[:3] > tupla(v_cli)[:3]
+    # o OrcaSlicer tem numeração própria e abriu projetos do Creality Print 7.3 sem reclamar
+    versao_nova = not orca and tupla(v_arq)[:3] > tupla(v_cli)[:3]
     if versao_nova and not a.permitir_versao_nova:
         sys.exit(f"O .3mf foi salvo no Creality Print {v_arq} e o instalado aqui é {v_cli}.\n"
                  "Atualize o Creality Print ou rode de novo com --permitir-versao-nova "
@@ -166,6 +176,8 @@ def main():
             nome += f"_bico{bico}"
         if fil_tipo not in nome:
             nome += f"_{fil_tipo}"
+        if orca:
+            nome += "_orca"
         destino = os.path.join(os.path.expanduser(a.saida), f"{nome}_{tempo_curto(tempo)}.gcode")
         with open(destino, "w", encoding="utf-8", newline="\n") as f:
             f.write(texto)
@@ -173,7 +185,13 @@ def main():
         shutil.rmtree(tmp, ignore_errors=True)
 
     print(f"G-code: {destino}")
-    print(f"Creality Print {v_cli} (projeto salvo na {v_arq})" + ("  ATENÇÃO: versão do projeto mais nova" if versao_nova else ""))
+    if orca:
+        print(f"FATIADO PELO ORCASLICER {v_cli} (projeto do Creality Print {v_arq}) – EXPERIMENTAL:\n"
+              "  não validado por impressão; o suporte sai diferente do Creality Print (mais material)\n"
+              "  e as opções que só existem no Creality Print são ignoradas. Diga isso a quem vai imprimir.")
+    else:
+        print(f"Creality Print {v_cli} (projeto salvo na {v_arq})"
+              + ("  ATENÇÃO: versão do projeto mais nova" if versao_nova else ""))
     print(f"Impressora/bico: {cfg.get('printer_settings_id')}  (nozzle_diameter {bico})")
     print(f"Filamento: {cfg.get('filament_settings_id')}  [{fil_tipo}]  bico {cfg.get('nozzle_temperature')} °C, "
           f"mesa {cfg.get('hot_plate_temp')} °C")

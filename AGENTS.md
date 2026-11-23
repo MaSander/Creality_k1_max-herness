@@ -21,7 +21,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/skills/creality-print-3mf/adicionar_bloqueador_3mf.py` | Acrescenta caixas de **bloqueio ou reforço de suporte** a um objeto, em coordenadas da mesa |
 | `.claude/skills/creality-print-3mf/analisar_malha.py` | **Analisa uma malha** (STL, OBJ, GLB ou `.3mf`): fechada, corpos, cabe na mesa, área de contato e balanços; render das vistas |
 | `.claude/skills/creality-print-3mf/checklist_3mf.py` | Roda o **checklist de entrega** de um `.3mf` por código e sai com erro se houver falha |
-| `.claude/skills/creality-print-3mf/fatiar_3mf.py` | **Fatia** um `.3mf` pela linha de comando do Creality Print (G-code com bico e filamento no nome e miniatura) |
+| `.claude/skills/creality-print-3mf/fatiar_3mf.py` | **Fatia** um `.3mf` pela linha de comando do Creality Print (G-code com bico e filamento no nome e miniatura). `--fatiador orca` usa o OrcaSlicer: experimental, ainda não validado por impressão |
 | `.claude/skills/k1max-impressora/SKILL.md` | Conexão com a K1 Max sem root (IP 192.168.0.69): status e histórico (`k1max_status.py`) e **envio para a lista sem imprimir** (`enviar_k1max.py`) |
 | `.claude/skills/k1max-calibracao/SKILL.md` | Calibração (flow, PA, fluxo volumétrico, retração) e troca de bico 0,4/0,2 |
 | `.claude/skills/calibrar-filamento-novo/SKILL.md` | Assistente passo a passo para calibrar filamento novo: pergunta tipo e marca, guia cada teste, coleta os resultados e grava o perfil |

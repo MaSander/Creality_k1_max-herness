@@ -50,6 +50,21 @@ def exe_creality(exe: str | None = None) -> str | None:
     return next((c for c in candidatos if os.path.exists(c)), None)
 
 
+def exe_orca(exe: str | None = None) -> str | None:
+    """Executável do OrcaSlicer: o informado, K1_ORCA_EXE ou os lugares de costume."""
+    if exe or os.environ.get("K1_ORCA_EXE"):
+        return exe or os.environ["K1_ORCA_EXE"]
+    if SISTEMA == "Darwin":
+        candidatos = ["/Applications/OrcaSlicer.app/Contents/MacOS/OrcaSlicer",
+                      str(Path.home() / "Applications/OrcaSlicer.app/Contents/MacOS/OrcaSlicer")]
+    elif SISTEMA == "Windows":
+        base = os.environ.get("ProgramFiles", r"C:\Program Files")
+        candidatos = [os.path.join(base, "OrcaSlicer", "orca-slicer.exe")]
+    else:
+        candidatos = []
+    return next((c for c in candidatos if os.path.exists(c)), None)
+
+
 def pasta_dados_creality() -> Path:
     """Pasta de dados do Creality Print (dentro dela há uma pasta por versão: 7.0, 7.3...)."""
     if SISTEMA == "Windows":
