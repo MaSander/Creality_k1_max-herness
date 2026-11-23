@@ -149,3 +149,34 @@ def test_analisar_malha_script_e_render(tmp_path, projeto_cubo):
     cubo = trimesh.creation.box((20, 30, 10))
     trimesh.Trimesh(cubo.vertices, cubo.faces[:-1]).export(stl)
     assert rodar("analisar_malha.py", stl).returncode == 1
+
+
+def test_ficha_da_peca_e_checklist_com_ficha(tmp_path):
+    stl, ficha, proj = tmp_path / "bloco_v1.stl", tmp_path / "ficha.json", tmp_path / "bloco.3mf"
+    trimesh.creation.box((20, 30, 10)).export(stl)
+    r = rodar("analisar_malha.py", stl, "--gravar-ficha", ficha, "--peca", "bloco", "--uso", "teste",
+              "--material", "PLA", "--bico", "0.4", "--critica", "largura 20 mm", "--rota", "script")
+    assert r.returncode == 0, r.stderr
+    f = json.loads(ficha.read_text(encoding="utf-8"))
+    assert f["arquivo"] == "bloco_v1.stl" and f["medido"]["dimensoes_mm"] == [20, 30, 10]
+    assert f["medidas_criticas"] == ["largura 20 mm"]
+
+    assert rodar("gerar_projeto_creality.py", REFERENCIA, REFERENCIA, stl, proj, "Bloco").returncode == 0
+    r = rodar("checklist_3mf.py", proj, "--origem", REFERENCIA, "--ficha", ficha)
+    assert r.returncode == 0, r.stdout
+    assert "Escala: dimensões iguais às da ficha" in r.stdout and "largura 20 mm" in r.stdout
+
+    f["material"], f["medido"]["dimensoes_mm"] = "PETG", [40, 60, 20]
+    ficha.write_text(json.dumps(f), encoding="utf-8")
+    r = rodar("checklist_3mf.py", proj, "--ficha", ficha)
+    assert r.returncode == 1
+    assert "A ficha da peça pede PETG" in r.stdout and "Escala: a ficha da peça diz 40 x 60 x 20" in r.stdout
+
+
+def test_ficha_nao_e_gravada_para_malha_reprovada(tmp_path):
+    stl, ficha = tmp_path / "aberta.stl", tmp_path / "ficha.json"
+    cubo = trimesh.creation.box((20, 30, 10))
+    trimesh.Trimesh(cubo.vertices, cubo.faces[:-1]).export(stl)
+    r = rodar("analisar_malha.py", stl, "--gravar-ficha", ficha, "--peca", "x", "--uso", "x", "--material", "PLA",
+              "--bico", "0.4")
+    assert r.returncode == 1 and not ficha.exists()

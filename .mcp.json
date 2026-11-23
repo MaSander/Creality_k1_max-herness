@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "solidcraft": {
+      "command": "solidcraft-cli",
+      "args": ["mcp", "--headless", "--allow-path", "pecas"]
+    },
+    "solidcraft-live": {
+      "command": "solidcraft-cli",
+      "args": ["mcp", "--connect", "127.0.0.1:27878", "--allow-path", "pecas"]
+    }
+  }
+}

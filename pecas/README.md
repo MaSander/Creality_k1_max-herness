@@ -2,10 +2,12 @@
 
 Uma pasta por peça (`pecas/<nome-da-peca>/`), sempre com um `README.md` de registro: origem e licença, configuração aprovada, resultado e lições.
 
+Peça projetada por nós tem também a **`ficha.json`**: uso, material, bico, orientação, medidas críticas e o que foi medido na malha. Ela é gravada pelo `analisar_malha.py --gravar-ficha` no fim da modelagem (skill `modelagem-3d`) e lida pelo agente configurador e pelo `checklist_3mf.py --ficha`.
+
 ## O que vai para o git
 | Arquivo | Onde | Por quê |
 |---|---|---|
-| `README.md` (registro) | git | Texto leve; o histórico mostra o que mudou |
+| `README.md` (registro) e `ficha.json` | git | Texto leve; o histórico mostra o que mudou |
 | Peças **nossas**: fonte (`.sc`, `.step`, script gerador) e **só a versão aprovada/atual** (`.stl` ou, de preferência, `.3mf`) | git via **LFS** (`.gitattributes`) | Projeto fonte, editável e reaproveitável |
 | **Versões intermediárias** (v1, v2… de cada iteração) | `local/` (ignorada) + backup no Drive pessoal | Cada versão tem ~20 MB, e arquivo que sobe no LFS nunca libera espaço. A peça gerada por script se refaz pelo commit do script |
 | Modelos de **terceiros** e projetos que contêm as malhas deles | `local/` (ignorada) | O repositório é **público**: só suba se a licença permitir redistribuir |

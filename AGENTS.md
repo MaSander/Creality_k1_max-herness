@@ -12,7 +12,9 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 |---|---|
 | `.claude/agents/configurador-impressao-k1max.md` | Subagente principal: fluxo de trabalho, regras invioláveis e checklist de entrega |
 | `.claude/skills/k1max-config-impressao/SKILL.md` | Equipamento, perfis de filamento calibrados e receitas por tipo de peça |
-| `.claude/skills/modelagem-3d/SKILL.md` | Projetar uma peça do zero (SolidCraft via MCP): regras de projeto para a K1 Max, prévia e exportação |
+| `.claude/skills/modelagem-3d/SKILL.md` | Projetar uma peça do zero: SolidCraft via MCP, script com `manifold3d` ou chat do SolidCraft; regras de projeto para a K1 Max, prévia, exportação e ficha da peça |
+| `.claude/skills/modelagem-3d/regras-projeto-k1max.md` | Regras de projeto para colar nas "Custom instructions" do chat do SolidCraft (até 4000 caracteres) |
+| `.mcp.json` | Registro dos servidores MCP do SolidCraft (`solidcraft` sem janela e `solidcraft-live` no app aberto), igual nos dois sistemas |
 | `.claude/skills/creality-print-3mf/SKILL.md` | Estrutura do `.3mf`, chaves de configuração, como gerar/revisar/alterar projetos por script e onde fica cada opção no Creality Print aberto |
 | `.claude/skills/creality-print-3mf/gerar_projeto_creality.py` | Gera o `.3mf` de um **modelo novo** a partir de um projeto modelo + projeto de configuração |
 | `.claude/skills/creality-print-3mf/alterar_config_3mf.py` | Altera só as configurações de um **`.3mf` existente** (malhas intactas); `--sem-altura-variavel` para suporte Organic |
@@ -29,7 +31,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/referencias/` | Projetos `.3mf` aprovados, usados como base (snowboarder 1:25, bico 0,4 detalhe e bico 0,2 v5) |
 | `projetos-base/` | Projetos `.3mf` de referência (por bico e filamento) usados como `MODELO`/`CONFIG` na geração |
 | `filamentos/` | Uma pasta por filamento calibrado: `perfil.md`, `perfil.json` e o preset `.json` para importar |
-| `pecas/` | Uma pasta por peça com `README.md` de registro (config aprovada, resultado, lições); peças nossas via Git LFS, modelos de terceiros em `local/` (ignorada) |
+| `pecas/` | Uma pasta por peça com `README.md` de registro (config aprovada, resultado, lições) e, nas peças nossas, a `ficha.json` que passa da modelagem para a preparação; peças nossas via Git LFS, modelos de terceiros em `local/` (ignorada) |
 | `pyproject.toml` e `uv.lock` | Bibliotecas Python dos scripts, com versões fixadas; tudo roda com `uv run` |
 | `ferramentas/k1comum.py` | O que os scripts têm em comum nos dois sistemas (pastas, Creality Print, cópia de `.3mf`, grupos de chaves) |
 | `ferramentas/k1malha.py` | Leitura de `.3mf` e de malhas e a análise de imprimibilidade usada pelos scripts |
@@ -37,7 +39,8 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/rules/fluxo-git.md` | Fluxo de trabalho com Git: branch por assunto e PR, nada direto na `main` |
 
 ## Quando usar o quê
-- **Projetar uma peça nova** (a partir de medidas, desenho ou foto) → skill `modelagem-3d` para modelar; depois o agente `configurador-impressao-k1max` prepara a impressão.
+- **Projetar uma peça nova** (a partir de medidas, desenho ou foto) → skill `modelagem-3d` para modelar e gravar a ficha da peça; depois o agente `configurador-impressao-k1max` prepara a impressão a partir da ficha.
+- **Peça modelada no chat do SolidCraft** → skill `modelagem-3d`, jeito C: confira a malha exportada e grave a ficha.
 - **Filamento novo** (calibrar, criar perfil, problemas depois de trocar de filamento) → skill `calibrar-filamento-novo` **na conversa principal**, sem delegar: é um vai e vem de testes impressos que um subagente não consegue esperar.
 - **Qualquer pedido de impressão** (STL, 3MF, GLB, STEP), revisão de `.3mf`, troca de bico ou ajuste pontual de calibração → delegue ao agente `configurador-impressao-k1max`.
 - O agente lê `k1max-config-impressao` **sempre**, `creality-print-3mf` ao gerar/editar projeto e `k1max-calibracao` só para calibração.
@@ -62,7 +65,7 @@ Antes de salvar ou rodar algo, identifique **em qual computador** a sessão est�
 | Pasta de entrega | `C:\Users\alemg\Downloads` | `~/Downloads` (`/Users/marcelosander/Downloads`) |
 | Python | `uv run <script>` (igual nos dois) | `uv run <script>` (igual nos dois) |
 | Creality Print | 7.x, perfis em `AppData\Roaming\Creality` (não editar direto) | instalado em `/Applications/Creality Print.app` |
-| Modelagem | Fusion 360 e SolidCraft (com MCP) | SolidCraft 0.30.1 com MCP (escopo local do projeto) |
+| Modelagem | Fusion 360 e SolidCraft (MCP pelo `.mcp.json`, ainda não testado no PC dele) | SolidCraft 0.30.1 (MCP pelo `.mcp.json` e por registro local) |
 
 **Python: um comando só, igual no Windows e no macOS**
 - Rode tudo com o [uv](https://docs.astral.sh/uv/), **da raiz do repositório**: `uv run .claude/skills/creality-print-3mf/gerar_projeto_creality.py ...`. Código solto: `uv run python -c "..."`. Testes: `uv run pytest`.

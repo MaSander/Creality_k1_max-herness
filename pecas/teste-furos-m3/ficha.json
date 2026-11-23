@@ -1,0 +1,30 @@
+{
+  "peca": "teste-furos-m3",
+  "versao": "1",
+  "data": "2026-11-22",
+  "arquivo": "teste_furos_m3_v1.stl",
+  "fonte": "teste_furos_m3_v1.sc",
+  "rota": "solidcraft",
+  "uso": "Corpo de prova para escolher o diâmetro do furo passante M3 e conferir o alojamento da porca M3 no PLA da casa",
+  "material": "PLA",
+  "bico": "0.4",
+  "orientacao": "como exportada: face de 40 x 20 na mesa, furos na vertical, alojamento da porca para cima",
+  "medidas_criticas": [
+    "três furos de teste: 3,2 / 3,4 / 3,6 mm",
+    "alojamento da porca M3: 5,7 mm entre faces, 2,6 mm de profundidade",
+    "chanfro da base: 0,4 mm"
+  ],
+  "medido": {
+    "dimensoes_mm": [
+      40.0,
+      20.0,
+      8.0
+    ],
+    "volume_cm3": 6.123,
+    "fechada": true,
+    "corpos": 1,
+    "area_contato_mm2": 725.4,
+    "angulo_suporte": 45.0,
+    "area_balanco_mm2": 0.0
+  }
+}
