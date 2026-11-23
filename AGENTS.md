@@ -42,9 +42,12 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 ## Quando usar o quê
 - **Projetar uma peça nova** (a partir de medidas, desenho ou foto) → skill `modelagem-3d` para modelar e gravar a ficha da peça; depois o agente `configurador-impressao-k1max` prepara a impressão a partir da ficha.
 - **Peça modelada no chat do SolidCraft** → skill `modelagem-3d`, jeito C: confira a malha exportada e grave a ficha.
-- **Filamento novo** (calibrar, criar perfil, problemas depois de trocar de filamento) → skill `calibrar-filamento-novo` **na conversa principal**, sem delegar: é um vai e vem de testes impressos que um subagente não consegue esperar.
-- **Qualquer pedido de impressão** (STL, 3MF, GLB, STEP), revisão de `.3mf`, troca de bico ou ajuste pontual de calibração → delegue ao agente `configurador-impressao-k1max`.
-- O agente lê `k1max-config-impressao` **sempre**, `creality-print-3mf` ao gerar/editar projeto e `k1max-calibracao` só para calibração.
+- **Calibrar filamento: só quando pedirem** (`/calibrar-filamento-novo` ou pedido direto). As skills `calibrar-filamento-novo` e `k1max-calibracao` não se acionam sozinhas: ao receber o pedido, leia o `SKILL.md` de `calibrar-filamento-novo` e conduza **na conversa principal**, sem delegar (é um vai e vem de testes impressos que um subagente não consegue esperar).
+  - **Trocar de carretel da mesma marca e modelo não é calibração**: usa o perfil que já existe. Não sugira calibrar.
+- **Qualquer pedido de impressão** (STL, 3MF, GLB, STEP), revisão de `.3mf`, troca de bico num projeto ou ajuste pontual de um valor → delegue ao agente `configurador-impressao-k1max`.
+  - **Antes de delegar, pergunte na conversa principal o que faltar** (o subagente não consegue perguntar no meio): bico e filamento **montados na impressora**, para que serve a peça e material (ou o caminho da `ficha.json`), e se é para fatiar e enviar para a lista. Passe as respostas no pedido.
+  - Se o agente voltar com **perguntas pendentes** (melhorias, orientação, mudança de filamento), faça as perguntas a quem pediu e continue com o mesmo agente, levando as respostas.
+- O agente lê `k1max-config-impressao` **sempre**, `creality-print-3mf` ao gerar/editar projeto e `k1max-calibracao` só para troca de bico ou quando pedirem um ajuste de calibração.
 
 ## Regras invioláveis (resumo – detalhes no agente)
 - Não alterar configurações de **filamento** sem pedir.
@@ -52,7 +55,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 - Não usar reparo automático de malha (pymeshfix etc.).
 - Nunca afirmar algo que não aconteceu.
 - **Nunca iniciar impressão remotamente**: o arquivo vai para a lista, e quem está na máquina inicia pela tela.
-- PLA: lembrar da **tampa aberta**. Trocou o bico: **autoteste e nivelamento**.
+- PLA: lembrar da **tampa aberta**. Trocou o bico: **nivelamento automático** antes de imprimir (o autoteste completo é opcional; detalhes em `k1max-calibracao`).
 - Todo projeto entregue vai acompanhado do **checklist** do agente, verificado por código (`checklist_3mf.py`).
 - Repositório **público**: não subir modelo de terceiros sem licença que permita redistribuir (veja `pecas/README.md`).
 - **Git:** nada de commit direto na `main`. Antes de editar um arquivo do repositório, crie uma branch do assunto (`peca/`, `skill/`, `fix/`, `perfil/`, `docs/`) a partir da `main` atualizada, e entregue por PR. Detalhes em `.claude/rules/fluxo-git.md`.

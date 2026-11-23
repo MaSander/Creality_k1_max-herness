@@ -1,9 +1,12 @@
 ---
 name: calibrar-filamento-novo
-description: Assistente passo a passo para calibrar um filamento novo (marca, tipo ou cor que ainda não tem perfil) na K1 Max com o Creality Print 7. Pergunta tipo e marca, diz qual teste imprimir e com quais valores, pede o resultado de cada um, faz as contas, grava tudo em filamentos/<filamento>/ e exporta o preset para importar no Creality Print. Use sempre que o Alexandre ou o Marcelo disserem que colocaram ou compraram um filamento novo, quiserem criar ou refazer o perfil de um filamento, estiverem com problemas de impressão depois de trocar de filamento, ou quiserem retomar uma calibração que ficou pela metade, mesmo sem usar a palavra "calibrar".
+description: Assistente passo a passo para calibrar um filamento na K1 Max com o Creality Print 7 — pergunta tipo e marca, diz qual teste imprimir e com quais valores, pede o resultado de cada um, faz as contas, grava tudo em filamentos/<filamento>/ e exporta o preset. Só por chamada explícita (/calibrar-filamento-novo ou pedido direto para calibrar ou retomar uma calibração). Trocar de carretel não é pedido de calibração.
+disable-model-invocation: true
 ---
 
 # Calibrar filamento novo – K1 Max
+
+**Só rode esta skill quando pedirem** (`/calibrar-filamento-novo`, "calibra esse filamento", "vamos continuar a calibração"). Trocar de carretel da mesma marca e modelo é rotina e usa o perfil que já existe: não sugira calibrar. Se alguém relatar problema de impressão depois de trocar de filamento, ajude com o problema e, no máximo, pergunte uma vez se quer calibrar.
 
 Você conduz a calibração **em conversa**: um teste por vez, a pessoa imprime, conta o resultado, você calcula, registra e passa para o próximo. Por isso **rode esta skill na conversa principal**, não delegue ao agente `configurador-impressao-k1max`: um subagente não consegue esperar a pessoa imprimir e responder.
 
