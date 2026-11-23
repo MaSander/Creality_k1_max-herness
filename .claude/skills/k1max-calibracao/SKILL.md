@@ -1,10 +1,13 @@
 ---
 name: k1max-calibracao
-description: Roteiro e contas das calibrações do Creality Print 7 na K1 Max do Alexandre (flow, pressure advance, fluxo volumétrico, retração) e procedimento de troca de bico 0,4/0,2. Use quando ele for calibrar filamento, trocar bico ou criar perfil novo.
+description: Contas e procedimentos das calibrações do Creality Print 7 na K1 Max (flow, pressure advance, fluxo volumétrico, retração) e da troca de bico 0,4/0,2. É material de consulta da skill calibrar-filamento-novo e do agente configurador; calibração só por pedido explícito.
+disable-model-invocation: true
 ---
 
 # Calibração – K1 Max
 
+> **Calibração só por pedido explícito.** Trocar de carretel da mesma marca e modelo usa o perfil que já existe.
+>
 > **Filamento novo:** o passo a passo guiado (perguntas, um teste por vez, registro em `filamentos/` e preset exportado) está na skill `calibrar-filamento-novo`. Esta skill guarda as contas e os procedimentos que ela usa.
 
 ## Antes de calibrar
@@ -13,14 +16,15 @@ description: Roteiro e contas das calibrações do Creality Print 7 na K1 Max do
 - **Processo:** o Standard do bico (`0.10mm Standard @Creality K1 Max 0.2 nozzle-1` ou o Standard 0,4).
   - Não use o processo Detalhe Miniaturas, porque o suporte e o brim ligados atrapalham as peças de teste.
 - **Mesa:** High Temp Plate.
-- **Depois de trocar o bico:** autoteste e nivelamento automático pela tela da impressora.
+- **Depois de trocar o bico:** nivelamento automático (veja "Depois de trocar o bico na impressora"). O autoteste completo é opcional.
 
 ## Ordem recomendada
-1. Fluxo (flow rate), primeiro o teste grosso e depois o fino.
-2. Pressure advance.
-3. Fluxo volumétrico máximo.
-4. Retração (opcional, só se houver fiapos).
-5. Torre de temperatura (opcional).
+A mesma da skill `calibrar-filamento-novo`: a temperatura muda o flow, o flow muda o PA, e o PA muda a retração.
+1. Torre de temperatura. Pode pular se o filamento é da mesma marca e linha de um já calibrado: comece da temperatura dele.
+2. Fluxo (flow rate), primeiro o teste grosso e depois o fino.
+3. Pressure advance.
+4. Fluxo volumétrico máximo.
+5. Retração (só se houver fiapos).
 
 Depois de cada teste: clique no lápis do filamento, coloque o valor novo e **salve por cima do mesmo preset**, não com "salvar como".
 

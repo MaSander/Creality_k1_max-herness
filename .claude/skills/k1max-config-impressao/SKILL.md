@@ -145,7 +145,7 @@ Notas:
 
 ## Lições de malha (GLB do Tripo e outros)
 - GLB é Y-up: gire 90° em X. Pode usar `KHR_mesh_quantization` (o trimesh lê).
-- Reduza para cerca de 200–250 mil faces com `fast_simplification`.
+- Reduza para cerca de 200–250 mil faces com `manifold3d` (`simplify`, `set_tolerance(1e-4)`) e confira com `analisar_malha.py` se continuou fechada. O `fast_simplification` já abriu buracos.
 - Corrija a orientação das faces com `trimesh.repair.fix_winding`/`fix_inversion` antes de booleanas e de medir espessura (manifold dá `NotManifold`).
 - Malha gerada por marching cubes sai com volume negativo: inverta com `faces[:, ::-1]`.
 - **Engrossar uma parte fina (prancha, esquis):** NÃO desloque vértices pelas normais. Isso deixou bordas serrilhadas, "triângulos" embaixo e defeitos na união com a bota (erro de 17/11/2026).

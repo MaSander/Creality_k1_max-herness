@@ -236,7 +236,7 @@ def main():
     # --- lembretes
     if tipo.upper().startswith("PLA"):
         c.add("info", "Lembrete: PLA imprime com a tampa da K1 Max aberta")
-    c.add("info", "Lembrete: se trocou o bico, autoteste e nivelamento antes de imprimir")
+    c.add("info", "Lembrete: se trocou o bico, nivelamento automático antes de imprimir")
 
     if a.render:
         k1malha.render(malha, r, a.render)
