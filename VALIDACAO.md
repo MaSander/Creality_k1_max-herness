@@ -31,12 +31,12 @@ O que já foi testado no Mac está na descrição de cada PR. **No Windows nada 
 - [ ] **A** `git status` logo depois: não pode aparecer arquivo modificado (confere o fim de linha LF do `.gitattributes`).
 
 ## 1. Fase 1 – base portátil (PR 5)
-- [ ] **A** Alterar um projeto com o JSON em arquivo. Crie `mudancas.json` com `{"wall_loops":"4"}` e rode:
+- [ ] **A** Alterar um projeto com o JSON em arquivo. Crie `mudancas.json` com `{"wall_loops":"5"}` e rode:
   ```
   uv run .claude/skills/creality-print-3mf/alterar_config_3mf.py ".claude/referencias/Snowboarder_1-25_PLA_bico_0.4_detalhe.3mf" "$env:USERPROFILE\Downloads\teste_alterar.3mf" --config mudancas.json
   ```
-  Esperado: `wall_loops: 2 -> 4`, a lista de chaves com `✓` (sem erro de acento) e `ok:` no fim.
-- [ ] **A** Abrir `teste_alterar.3mf` no Creality Print: abre sem aviso, com 4 paredes e o perfil de processo marcado com `*`.
+  Esperado: `wall_loops: 4 -> 5`, a lista de chaves com `✓` (sem erro de acento) e `ok:` no fim.
+- [ ] **A** Abrir `teste_alterar.3mf` no Creality Print: abre sem aviso, com 5 paredes e o perfil de processo marcado com `*`.
 - [ ] **M+A** Recusa de saída igual à entrada: rodar o mesmo comando com a SAIDA igual à ENTRADA. Esperado: "A SAIDA não pode ser o mesmo arquivo da ENTRADA."
 - [ ] **A** `uv run .claude/skills/calibrar-filamento-novo/perfil_filamento.py mostrar pla-flexygreen-vermelho` – imprime o perfil sem erro de codificação (tem emoji e seta).
 - [ ] **A** `uv run .claude/skills/k1max-impressora/k1max_status.py status` – mostra estado e temperaturas.
