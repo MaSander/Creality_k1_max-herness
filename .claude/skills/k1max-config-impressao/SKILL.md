@@ -16,36 +16,54 @@ description: Perfis, regras e receitas de configuração de impressão para a Cr
 - **Modelagem:** o Alexandre projeta no Fusion 360 e no SolidCraft; o Marcelo usa o SolidCraft via MCP (skill `modelagem-3d`).
 - **Computadores:** veja "Ambientes por pessoa" no `AGENTS.md` (Windows do Alexandre, Mac do Marcelo).
 
-## Perfis de filamento (calibrados por ele, não alterar sem pedir)
+## Perfis de filamento e de processo (não alterar sem pedir)
+**A fonte dos valores são os presets do Creality Print do Alexandre**, exportados para `.claude/perfis/creality-print/` (decisão de 22/11/2026). A tabela abaixo é gerada deles: não edite à mão. Como sincronizar: `.claude/perfis/COMO-IMPORTAR.md`.
 
-| | PLA FLEXYGREEN (0,4) | PLA FLEXYGREEN @…0.2 nozzle | PETG MASTERPRINT (0,4) | PETG MASTERPRINT @…0.2 nozzle |
+<!-- tabela-perfis:inicio -->
+_Gerado por `sincronizar_perfis.py tabela --gravar` a partir de `.claude/perfis/creality-print/`. Não edite à mão. **Negrito** = valor definido no preset; o resto vem do perfil de fábrica (lido do Creality Print deste computador, pasta `7.0`)._
+
+**Filamentos**
+
+| | PETG MASTERPRINT @Creality K1 Max 0.2 nozzle | PETG MASTERPRINT | PLA FLEXYGREEN @Creality K1 Max 0.2 nozzle | PLA FLEXYGREEN |
 |---|---|---|---|---|
-| Bico / 1ª camada | 210 / 215 °C | 210 / 215 °C | 220 / 230 °C | 220 / 230 °C |
-| Mesa / 1ª camada | 50 / 50 | 50 / 50 | 75 / 80 (textured 75/75) | igual |
-| Flow ratio | 0.98 | **1.035** (calibrado) | 0.95 | 0.95 (calibrar) |
-| Pressure advance | 0.052 | **0.20** (calibrado) | 0.025 | 0.025 (referência Creality: 0.29) |
-| Retração do filamento | 0.4 mm @ 40/40 | 0.4 | 0.7 | 0.7 |
-| Fluxo máximo | 20 mm³/s | **5** (teste sem falha até 5) | 18 | 2.5 |
-| Ventoinha | 100 / 100, lateral 80 | igual | 40–90, interface 100 | igual |
-| slow_down_layer_time | 0 | 8 | 8 | 8 |
+| Herda de | Generic PETG @Creality K1 Max 0.4 nozzle | Generic PETG @Creality K1 Max 0.4 nozzle | Generic PLA @Creality K1 Max 0.4 nozzle | Generic PLA @Creality K1 Max 0.4 nozzle |
+| Bico / 1ª camada (°C) | **220** / **230** | **220** / **230** | **210** / **215** | **210** / **215** |
+| Mesa lisa / 1ª camada (°C) | **75** / **80** | **80** / **80** | 50 / 50 | 50 / 50 |
+| Mesa texturizada / 1ª camada (°C) | **75** / **75** | **80** / **75** | 50 / 50 | 50 / 50 |
+| Flow ratio | **1.05** | 0.95 | **1.03** | 0.98 |
+| Pressure advance | **0.2** | **0.025** | **0.2** | **0.052** |
+| Retração (mm) / veloc. / desretração | **0.7** / da impressora / da impressora | **0.7** / da impressora / da impressora | **0.4** / **40** / **40** | **0.4** / **40** / **40** |
+| Fluxo máximo (mm³/s) | **2.5** | **20** | **7** | **20** |
+| Ventoinha mín. / máx. (%) | 40 / 90 | **30** / **50** | 100 / 100 | 100 / 100 |
+| Ventoinha lateral (%) | 0 | 0 | 80 | 80 |
+| Tempo mínimo de camada (s) | **8** | **8** | **0** | **0** |
+
+**Processos**
+
+| | 0.08mm Detalhe Miniaturas @Creality K1 Max 0.2 nozzle | 0.10mm Standard @Creality K1 Max 0.2 nozzle-1 | 0.20mm PLA FLEXY 0.07 tolerancia furo | PEÇA DELICADA M5 |
+|---|---|---|---|---|
+| Herda de | 0.08mm Standard @Creality K1 Max 0.4 nozzle | 0.08mm Standard @Creality K1 Max 0.4 nozzle | 0.20mm Standard @Creality K1 Max 0.4 nozzle | 0.08mm Standard @Creality K1 Max 0.4 nozzle |
+| Camada / 1ª camada (mm) | 0.08 / **0.12** | **0.1** / **0.14** | 0.2 / 0.2 | **0.1** / 0.2 |
+| Largura de linha (mm) | **0.22** | **0.22** | 0.42 | 0.42 |
+| Paredes / topo / base | **4** / **8** / **6** | **4** / **7** / **5** | 2 / 5 / 3 | **6** / **5** / 7 |
+| Preenchimento | 15% / **gyroid** | 15% / grid | 15% / grid | **100%** / grid |
+| Parede externa / interna (mm/s) | **60** / **100** | **110** / **130** | 200 / 300 | **40** / **50** |
+| Suporte | **1** / **tree(auto)** / **organic** | 0 / normal(auto) / default | **1** / normal(auto) / default | **1** / normal(auto) / **snug** |
+| Folga Z do suporte em cima / embaixo (mm) | **0.16** / **0.16** | 0.2 / 0.2 | **0.1** / **0.1** | 0.2 / 0.2 |
+| Brim: tipo / largura / gap | **outer_only** / **3** / **0** | auto_brim / 5 / 0.1 | **brim_ears** / 5 / **0** | auto_brim / 5 / 0.1 |
+| Compensação de pé de elefante | **0** | 0.15 | 0.15 | 0.15 |
+| Compensação XY furo / contorno | 0 / 0 | 0 / 0 | **0.07** / 0 | 0 / 0 |
+
+<!-- tabela-perfis:fim -->
 
 Notas:
+- **Filamento que não está na tabela** (cor ou marca nova): veja `filamentos/<slug>/perfil.md`. Trocar de carretel da **mesma marca e modelo** usa o perfil que já existe, sem calibrar de novo.
+- **Projeto antigo pode ter valores diferentes do preset atual** (os `.3mf` de `.claude/referencias/` têm tempo mínimo de camada 8, e o do bico 0,2 tem flow 1.035 e fluxo máximo 5). O `checklist_3mf.py` avisa. Num projeto novo, valem os do preset.
+- **Folga Z do suporte no `0.08mm Detalhe Miniaturas`: pendente de decisão.** O preset está com 0,16, e a regra da casa (e o `checklist_3mf.py`) pede pelo menos 0,24 em PLA para o suporte soltar. Enquanto o Alexandre não decidir, use 0,24 nos projetos em PLA e diga isso na entrega.
 - `enable_filament_dynamic_map = 0`, então `material_flow_temp_graph` não tem efeito.
-- Mudar `slow_down_layer_time` para 8 em peças pequenas é uma mudança de filamento. Avise ou pergunte antes.
-
-## Processos de usuário (bico 0,2)
-- **0.10mm Standard @Creality K1 Max 0.2 nozzle**, valores da wiki da Creality:
-  - camada 0,10, 1ª camada 0,14;
-  - linha 0,22 (topo e 1ª camada 0,25);
-  - 4 paredes, topo 7, base 5, infill 15% grid;
-  - velocidades: externa 110, interna 130, infill 120, topo 100, 1ª camada 18;
-  - aceleração 3000 nas paredes, 2000 na 1ª camada e no topo; jerk 3.
-- **0.08mm Detalhe Miniaturas @Creality K1 Max 0.2 nozzle:**
-  - camada 0,08, 1ª camada 0,12, Arachne, 4 paredes, topo 8, base 6, gyroid 15%;
-  - velocidades: externa 60, interna 100, topo 80;
-  - suporte Organic com folga Z de 0,24 em cima e embaixo (o pacote de perfis de 18/11 saiu com 0,16 e foi corrigido em 20/11);
-  - brim só por fora, 3 mm, gap 0, compensação de pé de elefante 0.
+- Mudar `slow_down_layer_time` (tempo mínimo de camada) numa peça pequena é uma mudança de filamento. Avise ou pergunte antes.
 - **Limite de velocidade do bico 0,2:** velocidade ≤ fluxo máximo ÷ (largura × camada). Exemplo: 0,22 × 0,08 a 150 mm/s dá 2,6 mm³/s.
+- O `0.10mm Standard @Creality K1 Max 0.2 nozzle-1` segue os valores da wiki da Creality para o bico 0,2 (velocidades e acelerações estão no preset).
 
 ## Regras da casa (definidas pelo Alexandre, valem para os dois)
 1. Não mexer em filamento sem pedir.

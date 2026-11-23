@@ -27,7 +27,8 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/skills/calibrar-filamento-novo/SKILL.md` | Assistente passo a passo para calibrar filamento novo: pergunta tipo e marca, guia cada teste, coleta os resultados e grava o perfil |
 | `.claude/skills/calibrar-filamento-novo/perfil_filamento.py` | Registra testes e parâmetros em `filamentos/`, faz as contas e exporta o preset para o Creality Print |
 | `.claude/perfis/K1_Max_bico_0.2_Alexandre.creality_printer` | Pacote de perfis do bico 0,2 (impressora, processos e filamentos) para importar no Creality |
-| `.claude/perfis/perfis_creality_7.3.zip` e `creality-print-7.3/` | **Todos** os perfis de usuário do Creality Print 7.3 dele (bicos 0,4 e 0,2), exportados para o irmão importar. Instruções em `COMO-IMPORTAR.md`; atualize com `exportar_perfis.ps1` |
+| `.claude/perfis/creality-print/` e `perfis_creality.zip` | Presets de usuário do Creality Print do Alexandre (bicos 0,4 e 0,2): **a fonte dos valores de filamento e processo**. Passo a passo em `COMO-IMPORTAR.md` |
+| `.claude/perfis/sincronizar_perfis.py` | Compara o Creality Print deste computador com o repositório, exporta os presets, refaz o zip e gera a tabela de perfis da skill `k1max-config-impressao` |
 | `.claude/referencias/` | Projetos `.3mf` aprovados, usados como base (snowboarder 1:25, bico 0,4 detalhe e bico 0,2 v5) |
 | `projetos-base/` | Projetos `.3mf` de referência (por bico e filamento) usados como `MODELO`/`CONFIG` na geração |
 | `filamentos/` | Uma pasta por filamento calibrado: `perfil.md`, `perfil.json` e o preset `.json` para importar |
@@ -75,10 +76,10 @@ Antes de salvar ou rodar algo, identifique **em qual computador** a sessão est�
 - **JSON na linha de comando:** no PowerShell as aspas se perdem. Grave o JSON num arquivo e passe o arquivo (`--config`, `--caixas`); funciona em qualquer shell.
 - Pasta de entrega e Creality Print: os scripts acham sozinhos (`ferramentas/k1comum.py`). Para trocar, defina `K1_ENTREGA` ou `K1_CREALITY_EXE`.
 
-Nos dois: os perfis do Creality não são editados diretamente; entregue perfis como pacote `.creality_printer` para importar.
+Nos dois: os perfis do Creality não são editados diretamente na pasta do programa; a entrada é pelo menu File → Import → Import Configuration (zip de `.claude/perfis/` ou preset de `filamentos/`).
 
 ## Manutenção
 - Skills novas: `.claude/skills/<nome>/SKILL.md` com frontmatter `name` e `description`.
 - Agentes novos: `.claude/agents/<nome>.md`.
-- Ao calibrar um filamento novo, registre em `filamentos/` (skill `calibrar-filamento-novo`) e atualize a tabela de perfis em `k1max-config-impressao`.
+- Mudou um preset no Creality Print ou calibrou um filamento: `sincronizar_perfis.py exportar` e `tabela --gravar` (veja `.claude/perfis/COMO-IMPORTAR.md`). A tabela de perfis de `k1max-config-impressao` é gerada; não edite à mão. O histórico dos testes vai em `filamentos/` (skill `calibrar-filamento-novo`).
 - Ao salvar um projeto de referência novo, coloque em `projetos-base/` e atualize o `README.md` de lá.

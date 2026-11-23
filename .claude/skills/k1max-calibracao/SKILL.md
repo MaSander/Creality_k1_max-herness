@@ -51,14 +51,10 @@ Depois de cada teste: clique no lápis do filamento, coloque o valor novo e **sa
 - Faixa de 0,2 a 1,0 mm. A dele no PLA é 0,4 mm, contra 0,8 mm no perfil da Creality para o bico 0,2.
 
 ## Resultados atuais
-| Filamento / bico | Flow | PA | Fluxo máximo | Observação |
-|---|---|---|---|---|
-| PLA FLEXYGREEN / 0,4 | 0.98 | 0.052 | 20 | calibração original |
-| PLA FLEXYGREEN / 0,2 | **1.035** | **0.20** | **5** | calibrado em 18/11/2026 |
-| PETG MASTERPRINT / 0,4 | 0.95 | 0.025 | 18 | calibração original |
-| PETG MASTERPRINT / 0,2 | 0.95 | 0.025 | 2.5 | **ainda não calibrado** (referência Creality: PA 0.29) |
+Os valores em uso ficam num lugar só: a tabela de perfis da skill `k1max-config-impressao`, gerada dos presets do Creality Print (`.claude/perfis/creality-print/`). Não repita valores aqui.
 
-Atualize esta tabela sempre que ele mandar resultados novos.
+- Depois de salvar um resultado novo no preset do Creality Print, sincronize: `uv run .claude/perfis/sincronizar_perfis.py exportar` e `tabela --gravar` (passo a passo em `.claude/perfis/COMO-IMPORTAR.md`).
+- O histórico dos testes de cada filamento (o que foi testado e por quê) fica em `filamentos/<slug>/`.
 
 ## Trocar de bico num projeto pronto ("readequar só o bico")
 Quando ele pedir para mudar de bico "mudando o mínimo possível", altere SÓ estes três grupos:
