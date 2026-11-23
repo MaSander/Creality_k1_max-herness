@@ -21,4 +21,4 @@ Antes de subir um modelo baixado, **confira a licença** (no MakerWorld, ela fic
 ## Git LFS
 - Mac: `brew install git-lfs && git lfs install` (já feito no Mac do Marcelo em 21/11/2026).
 - Windows: já vem com o Git for Windows; rode `git lfs install` uma vez.
-- O armazenamento LFS conta na cota da conta dona do repositório (Alexandre).
+- O armazenamento LFS conta na cota da conta dona do repositório (Marcelo, desde 22/11/2026): 10 GB de armazenamento e 10 GB de download por mês no plano gratuito. Arquivo apagado **não** libera espaço no LFS.
