@@ -13,12 +13,22 @@ Uso (da raiz do repositório):
   --render     grava um PNG com 4 vistas: balanço em vermelho, contato com a mesa em azul
   --json       imprime o resultado em JSON (para outro script ler)
 
+Ficha da peça (passagem da modelagem para a preparação da impressão): com --gravar-ficha, grava
+pecas/<peca>/ficha.json com o que foi medido e o que quem projetou sabe (uso, material, bico,
+medidas críticas). Só grava se a malha for aprovada.
+  uv run .claude/skills/creality-print-3mf/analisar_malha.py pecas/<peca>/<peca>_v1.stl \
+        --gravar-ficha pecas/<peca>/ficha.json --peca <peca> --versao 1 --rota solidcraft \
+        --fonte <peca>_v1.sc --uso "para que serve e onde fica" --material PLA --bico 0.4 \
+        --orientacao "como exportada, face maior na mesa" --critica "furo passante M3 = 3,4 mm"
+
 A malha é analisada na orientação em que está no arquivo (Z para cima). Num .3mf, as partes de
 peça são analisadas juntas, na posição da mesa; bloqueadores e modificadores ficam de fora.
 Não mede espessura de parede.
 """
 import argparse
+import datetime
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -35,7 +45,19 @@ def main():
     ap.add_argument("--brim", type=float, default=0.0)
     ap.add_argument("--render")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--gravar-ficha", metavar="FICHA.json")
+    ap.add_argument("--peca")
+    ap.add_argument("--versao")
+    ap.add_argument("--rota", choices=["solidcraft", "script", "terceiros"])
+    ap.add_argument("--fonte", help="arquivo fonte (.sc, script gerador), relativo à pasta da ficha")
+    ap.add_argument("--uso")
+    ap.add_argument("--material")
+    ap.add_argument("--bico")
+    ap.add_argument("--orientacao")
+    ap.add_argument("--critica", action="append", default=[], help="medida crítica (pode repetir)")
     a = ap.parse_args()
+    if a.gravar_ficha and not (a.peca and a.uso and a.material and a.bico):
+        ap.error("--gravar-ficha pede pelo menos --peca, --uso, --material e --bico")
 
     na_mesa = a.arquivo.lower().endswith(".3mf")
     if na_mesa:
@@ -75,6 +97,23 @@ def main():
             print(f"REPROVADA: {f}")
         if not falhas:
             print("Aprovada.")
+    if a.gravar_ficha:
+        if falhas:
+            print("Ficha NÃO gravada: a malha foi reprovada.", file=sys.stderr)
+        else:
+            pasta = os.path.dirname(os.path.abspath(a.gravar_ficha))
+            ficha = {
+                "peca": a.peca, "versao": a.versao, "data": datetime.date.today().isoformat(),
+                "arquivo": os.path.relpath(os.path.abspath(a.arquivo), pasta).replace(os.sep, "/"),
+                "fonte": a.fonte, "rota": a.rota,
+                "uso": a.uso, "material": a.material, "bico": a.bico,
+                "orientacao": a.orientacao, "medidas_criticas": a.critica,
+                "medido": {k: r[k] for k in ("dimensoes_mm", "volume_cm3", "fechada", "corpos", "area_contato_mm2",
+                                             "angulo_suporte", "area_balanco_mm2")},
+            }
+            with open(a.gravar_ficha, "w", encoding="utf-8", newline="\n") as f:
+                f.write(json.dumps(ficha, ensure_ascii=False, indent=2) + "\n")
+            print(f"Ficha gravada: {a.gravar_ficha}", file=sys.stderr if a.json else sys.stdout)
     sys.exit(1 if falhas else 0)
 
 

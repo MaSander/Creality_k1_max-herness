@@ -73,6 +73,7 @@ uv run .claude/skills/creality-print-3mf/analisar_malha.py peca.stl [--angulo 45
 - Reprova malha aberta, que não cabe ou sem nenhuma face apoiada na mesa.
 - Analisa na orientação do arquivo. `--render` grava 4 vistas com o balanço em vermelho e o contato em azul.
 - Não mede espessura de parede nem folga de print-in-place.
+- `--gravar-ficha pecas/<peca>/ficha.json` (com `--peca`, `--uso`, `--material`, `--bico` e, se houver, `--critica`, `--orientacao`, `--fonte`, `--rota`, `--versao`): grava a ficha da peça, só se a malha for aprovada. O passo a passo está na skill `modelagem-3d`.
 
 **`checklist_3mf.py`** – antes de entregar o projeto:
 ```
@@ -82,6 +83,7 @@ uv run .claude/skills/creality-print-3mf/checklist_3mf.py PROJETO.3mf --origem C
 - `--bico`: o bico montado na impressora, confirmado com quem pediu.
 - Confere impressora e bico, brim encostado (gap 0 **e** pé de elefante 0), malha fechada dentro do `.3mf`, se cabe e está centrada e apoiada na mesa, suporte (folga Z ≥ 0,24 em PLA, Organic sem altura variável, interface, distância lateral) e lista os balanços.
 - Compara o filamento com o preset de `.claude/perfis/` e dá `[aviso]` se diferir (o preset pode ter sido atualizado depois do projeto).
+- `--ficha pecas/<peca>/ficha.json`: a ficha gravada na modelagem (skill `modelagem-3d`). Dimensões, material ou bico diferentes dos dela são `[FALHA]`; uso, orientação e medidas críticas saem como `[info]`.
 - O que o código não tem como saber sai como `[manual]`: escala contra a medida de referência, motivo da orientação e render de perto quando a malha foi alterada.
 
 A leitura do `.3mf` e a análise ficam em `ferramentas/k1malha.py` (`ler_3mf`, `analisar`, `render`): use essas funções em vez de reescrever a conferência.

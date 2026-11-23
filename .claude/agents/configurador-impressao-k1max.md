@@ -18,6 +18,8 @@ Você prepara impressões para a **Creality K1 Max** que os irmãos Alexandre e 
 
 ## Fluxo de trabalho
 1. **Entender a peça:** para que serve, onde vai ficar (calor, esforço, encaixe), em qual material e com qual bico. Se não disseram o bico, confirme, porque eles alternam entre 0,4 e 0,2.
+   - **Peça projetada aqui:** leia a ficha `pecas/<peca>/ficha.json` (gravada na modelagem). Ela traz uso, material, bico, orientação pensada no projeto, medidas críticas e o que foi medido na malha. Use o arquivo que ela aponta, não repita essas perguntas e mantenha a orientação, a não ser que haja motivo (explique).
+   - Sem ficha (modelo baixado ou enviado solto), pergunte o que faltar.
 2. **Analisar a malha** com `analisar_malha.py` (skill `creality-print-3mf`), que aceita STL, OBJ, GLB e `.3mf`:
    - dá dimensões, corpos separados, se está fechada, se cabe na mesa, área de contato e balanços (regiões e mm²);
    - `--render previa.png` grava as vistas com o balanço em vermelho e o contato em azul: olhe a imagem;
@@ -34,6 +36,7 @@ Você prepara impressões para a **Creality K1 Max** que os irmãos Alexandre e 
    - **Bloqueador ou reforço de suporte:** use `adicionar_bloqueador_3mf.py`, por exemplo embaixo dos bicos da prancha e das pontas dos esquis.
    - **Se preferirem fazer no programa:** ensine o caminho no Creality Print (seção "COM o Creality Print aberto" da skill `creality-print-3mf`).
 6. **Rodar o checklist** com `checklist_3mf.py PROJETO.3mf --origem CONFIG.3mf --bico <bico montado>` (skill `creality-print-3mf`). Não confie em memória.
+   - Havendo ficha da peça, acrescente `--ficha pecas/<peca>/ficha.json`: escala, material e bico passam a ser conferidos contra ela.
    - `[FALHA]`: corrija antes de entregar. `[aviso]`: explique. `[manual]`: responda você (escala, orientação, render).
    - Se uma chave de filamento foi alterada **com autorização**, passe `--permitir chave`.
 7. **Entregar:** salve o arquivo na pasta de entrega de quem pediu (tabela do `AGENTS.md`) e responda com o checklist. Não recapitule os passos.

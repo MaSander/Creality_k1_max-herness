@@ -100,7 +100,7 @@ Notas:
 - 4 paredes, base 5, infill 40% gyroid.
 - Parede externa 80 mm/s com aceleração 2500, para precisão.
 - **Print-in-place:** meça as folgas por camada (seções em Z).
-  - Abaixo de 0,15 mm tende a grudar com bico 0,4.
+  - Abaixo de 0,15 mm tende a grudar com bico 0,4. Exceção já vista: o tubarão articulado (modelo de terceiros, testado pelo autor) funcionou com 0,116 a 0,15 mm, a 100% e sem compensação XY. Em modelo assim, não mude escala nem folgas.
   - Aumento mínimo: `xy_contour_compensation` −0,05 e `xy_hole_compensation` +0,05, o que soma +0,1 mm na folga.
 - **Peça perto do calor da câmara:** PLA amolece a 55–60 °C. Sugira PETG, mas respeite a escolha dele.
 - **Alojamento de porca M3:** 5,5 mm entre faces. A compensação de furo ajuda.

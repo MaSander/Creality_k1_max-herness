@@ -10,11 +10,12 @@ Sai com código 1 se houver alguma FALHA.
 
 Uso (da raiz do repositório):
   uv run .claude/skills/creality-print-3mf/checklist_3mf.py PROJETO.3mf [--bico 0.4] [--origem CONFIG.3mf]
-        [--permitir chave[,chave...]] [--render previa.png]
+        [--permitir chave[,chave...]] [--ficha pecas/<peca>/ficha.json] [--render previa.png]
 
   --bico D        bico que está montado na impressora: falha se o projeto for de outro
   --origem X.3mf  projeto de onde vieram as configurações: falha se alguma chave de FILAMENTO mudou
   --permitir      chaves de filamento que foram alteradas com autorização (não contam como falha)
+  --ficha         ficha da peça gravada na modelagem: confere escala, material e bico contra ela
   --render        grava o PNG da análise da malha (balanço em vermelho, contato em azul)
 """
 import argparse
@@ -81,8 +82,10 @@ def main():
     ap.add_argument("--bico")
     ap.add_argument("--origem")
     ap.add_argument("--permitir", default="")
+    ap.add_argument("--ficha")
     ap.add_argument("--render")
     a = ap.parse_args()
+    ficha = json.loads(Path(a.ficha).read_text(encoding="utf-8")) if a.ficha else None
     permitidas = {k for k in a.permitir.split(",") if k}
 
     proj = k1malha.ler_3mf(a.projeto)
@@ -106,6 +109,9 @@ def main():
                    f"Bico montado é {a.bico}, mas o projeto é para {bico}")
     else:
         c.add("manual", f"Confirme com quem pediu se o bico montado é o {bico}")
+    if ficha:
+        c.conferir(num(ficha.get("bico")) == num(bico), f"Bico igual ao da ficha da peça ({ficha.get('bico')})",
+                   f"A ficha da peça pede bico {ficha.get('bico')}, mas o projeto é para {bico}")
     c.add("info", f"Processo: {s.get('print_settings_id')}   camada {s.get('layer_height')} mm   "
                   f"mesa: {s.get('curr_bed_type')}")
 
@@ -113,6 +119,10 @@ def main():
     fil = str(primeiro(s.get("filament_settings_id")))
     tipo = str(primeiro(s.get("filament_type")))
     c.add("info", f"Filamento: {fil} [{tipo}]   " + "   ".join(f"{k}={primeiro(s.get(k))}" for k in CITAR))
+    if ficha:
+        mat = str(ficha.get("material", ""))
+        c.conferir(mat.upper() == tipo.upper(), f"Material igual ao da ficha da peça ({mat})",
+                   f"A ficha da peça pede {mat}, mas o filamento do projeto é {tipo}")
     if a.origem:
         so = k1malha.ler_3mf(a.origem).settings
         mudou = sorted(k for k in set(s) | set(so)
@@ -155,7 +165,22 @@ def main():
     c.conferir(r["fechada"] and r["volume_valido"],
                f"Malha no .3mf fechada: {d[0]:.2f} x {d[1]:.2f} x {d[2]:.2f} mm, {r['faces']} faces, "
                f"{r['corpos']} corpo(s)", "Malha no .3mf aberta ou com faces invertidas")
-    c.add("manual", f"Escala: confira {d[0]:.2f} x {d[1]:.2f} x {d[2]:.2f} mm contra a medida de referência da peça")
+    if ficha:
+        esperado = [float(x) for x in ficha["medido"]["dimensoes_mm"]]
+        igual = all(abs(x - y) <= 0.05 for x, y in zip(d, esperado))
+        girada = all(abs(x - y) <= 0.05 for x, y in zip(sorted(d), sorted(esperado)))
+        c.conferir(igual or girada, "Escala: dimensões iguais às da ficha da peça"
+                   + ("" if igual else " (orientação diferente da exportada na modelagem)"),
+                   f"Escala: a ficha da peça diz {esperado[0]:g} x {esperado[1]:g} x {esperado[2]:g} mm "
+                   f"e o projeto tem {d[0]:.2f} x {d[1]:.2f} x {d[2]:.2f} mm")
+        c.add("info", f"Uso (ficha): {ficha.get('uso')}")
+        if ficha.get("orientacao"):
+            c.add("info", f"Orientação pensada no projeto (ficha): {ficha['orientacao']}")
+        if ficha.get("medidas_criticas"):
+            c.add("info", "Medidas críticas (ficha): " + "; ".join(ficha["medidas_criticas"]))
+    else:
+        c.add("manual", f"Escala: confira {d[0]:.2f} x {d[1]:.2f} x {d[2]:.2f} mm contra a medida de referência "
+                        "da peça (ou passe --ficha)")
     c.conferir(r["cabe_na_mesa"], f"Cabe na mesa de 300 x 300 com o brim (x {r['minimo'][0]:.1f} a "
                f"{r['maximo'][0]:.1f}, y {r['minimo'][1]:.1f} a {r['maximo'][1]:.1f}, altura {d[2]:.1f})",
                f"Não cabe na mesa com brim de {brim:g} mm: x {r['minimo'][0]:.1f} a {r['maximo'][0]:.1f}, "
