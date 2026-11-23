@@ -23,6 +23,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `.claude/skills/creality-print-3mf/checklist_3mf.py` | Roda o **checklist de entrega** de um `.3mf` por código e sai com erro se houver falha |
 | `.claude/skills/creality-print-3mf/fatiar_3mf.py` | **Fatia** um `.3mf` pela linha de comando do Creality Print (G-code com bico e filamento no nome e miniatura). `--fatiador orca` usa o OrcaSlicer: experimental, ainda não validado por impressão |
 | `.claude/skills/k1max-impressora/SKILL.md` | Conexão com a K1 Max sem root (IP 192.168.0.69): status e histórico (`k1max_status.py`) e **envio para a lista sem imprimir** (`enviar_k1max.py`) |
+| `.claude/skills/registro-impressao/SKILL.md` | Depois da impressão: pergunta o resultado, grava a entrada no README da peça (`registrar_impressao.py`, com o histórico da impressora e a configuração do projeto) e propõe levar a lição para a skill certa |
 | `.claude/skills/k1max-calibracao/SKILL.md` | Calibração (flow, PA, fluxo volumétrico, retração) e troca de bico 0,4/0,2 |
 | `.claude/skills/calibrar-filamento-novo/SKILL.md` | Assistente passo a passo para calibrar filamento novo: pergunta tipo e marca, guia cada teste, coleta os resultados e grava o perfil |
 | `.claude/skills/calibrar-filamento-novo/perfil_filamento.py` | Registra testes e parâmetros em `filamentos/`, faz as contas e exporta o preset para o Creality Print |
@@ -47,6 +48,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 - **Qualquer pedido de impressão** (STL, 3MF, GLB, STEP), revisão de `.3mf`, troca de bico num projeto ou ajuste pontual de um valor → delegue ao agente `configurador-impressao-k1max`.
   - **Antes de delegar, pergunte na conversa principal o que faltar** (o subagente não consegue perguntar no meio): bico e filamento **montados na impressora**, para que serve a peça e material (ou o caminho da `ficha.json`), e se é para fatiar e enviar para a lista. Passe as respostas no pedido.
   - Se o agente voltar com **perguntas pendentes** (melhorias, orientação, mudança de filamento), faça as perguntas a quem pediu e continue com o mesmo agente, levando as respostas.
+- **Contaram como a impressão saiu** (boa ou ruim) → skill `registro-impressao`, na conversa principal: registra no README da peça e pergunta se a lição vira regra.
 - O agente lê `k1max-config-impressao` **sempre**, `creality-print-3mf` ao gerar/editar projeto e `k1max-calibracao` só para troca de bico ou quando pedirem um ajuste de calibração.
 
 ## Regras invioláveis (resumo – detalhes no agente)
