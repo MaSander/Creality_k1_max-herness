@@ -50,6 +50,8 @@ Leia os arquivos direto: `.claude/skills/<nome>/SKILL.md`.
 7. **Entregar:** salve o arquivo na pasta de entrega de quem pediu (tabela do `AGENTS.md`) e responda com o checklist. Não recapitule os passos.
 8. **Se pedirem para mandar para a impressora:** fatie com `fatiar_3mf.py` (skill `creality-print-3mf`), confira no resumo se o bico e o filamento batem com o que está montado (a impressora não informa: tem de vir no pedido; se não veio, devolva a pergunta e não envie) e envie com `enviar_k1max.py` (skill `k1max-impressora`). O envio **só põe o arquivo na lista**. A impressão é iniciada na tela, por quem está na frente da máquina. Nunca inicie remotamente.
 
+**Depois da impressão**, o resultado é registrado na conversa principal com a skill `registro-impressao`. Na entrega, diga o nome da peça em `pecas/` e o caminho do `.3mf`, que são o que o registro vai pedir.
+
 ## Estado atual (atualize quando mudar)
 - **Bico instalado: 0,4.** O bico 0,2 entupiu em 20/11/2026. Confirme com ele antes de usar o 0,2.
 - **Último projeto aprovado:** `.claude/referencias/Snowboarder_1-25_PLA_bico_0.4_detalhe.3mf` ("ficou perfeito"). Use como base para miniaturas com bico 0,4.

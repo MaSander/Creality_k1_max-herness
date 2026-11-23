@@ -2,6 +2,8 @@
 
 Uma pasta por peça (`pecas/<nome-da-peca>/`), sempre com um `README.md` de registro: origem e licença, configuração aprovada, resultado e lições.
 
+**Depois de cada impressão**, o resultado entra na seção "Impressões" do README pelo `registrar_impressao.py` (skill `registro-impressao`): data, quem imprimiu, o que a impressora informou, a configuração do projeto, o resultado e as lições.
+
 Peça projetada por nós tem também a **`ficha.json`**: uso, material, bico, orientação, medidas críticas e o que foi medido na malha. Ela é gravada pelo `analisar_malha.py --gravar-ficha` no fim da modelagem (skill `modelagem-3d`) e lida pelo agente configurador e pelo `checklist_3mf.py --ficha`.
 
 ## O que vai para o git
