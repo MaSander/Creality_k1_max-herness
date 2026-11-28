@@ -6,10 +6,11 @@
 ## Arquivos
 | Arquivo | O que é |
 |---|---|
-| `gerar_suporte.py` | Gera a malha (`manifold3d`, level set). Uso: `uv run pecas/suporte-headset-parede/gerar_suporte.py --versao <n>` |
+| `gerar_suporte_v13.py` | Gera a v13 (`manifold3d`, level set): berço oval solto da parede (raio 57, para o arco do fone de 110 x 40 mm por dentro) sobre três pés separados. Uso: `uv run pecas/suporte-headset-parede/gerar_suporte_v13.py` |
+| `gerar_suporte.py` | Gerador da v12 (placa de parede inteira). Uso: `uv run pecas/suporte-headset-parede/gerar_suporte.py --versao <n>` |
 | `previa.py` | Renderiza as prévias PNG |
-| `suporte_headset_v12.stl` | Versão atual |
-| `local/` (fora do git) | v1 a v11 e o projeto `suporte_headset_v6.3mf`, com backup no Drive pessoal do Marcelo |
+| `suporte_headset_v13.stl` | Versão atual. A ponta de trás do berço fica em balanço: imprimir com suporte |
+| `local/` (fora do git) | v1 a v12 e o projeto `suporte_headset_v6.3mf`, com backup no Drive pessoal do Marcelo |
 | `previa_v*.png`, `opcoes_berco_v10.png` | Prévias de cada versão |
 
 ## Configuração aprovada
