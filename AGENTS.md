@@ -38,6 +38,7 @@ Este repositório guarda o agente e as skills que ajudam o **Alexandre** e o **M
 | `ferramentas/k1comum.py` | O que os scripts têm em comum nos dois sistemas (pastas, Creality Print, cópia de `.3mf`, grupos de chaves) |
 | `ferramentas/k1malha.py` | Leitura de `.3mf` e de malhas e a análise de imprimibilidade usada pelos scripts |
 | `testes/` | Testes automatizados dos scripts (`uv run pytest`) |
+| `VALIDACAO.md` | Passo a passo para validar o refino de 22/11/2026 (PRs 5 a 12) nos dois computadores e na impressora; apagar quando tudo estiver marcado |
 | `.claude/rules/fluxo-git.md` | Fluxo de trabalho com Git: branch por assunto e PR, nada direto na `main` |
 
 ## Quando usar o quê
